@@ -305,7 +305,7 @@ def scenario_docs():
     S["04_slow_buyer"] = {
         "title": "Genuine invoice, slow-paying buyer", "attack": None, "lender": "lender_a", "buyer": "Orbit Retail",
         "story": "Clean documents, but Orbit Retail pays about 40 days late on average.",
-        "expect": "Manual review with a lower advance. Click 'Buyer confirms' and the grade improves.",
+        "expect": "Manual review at 75% advance. Request buyer confirmation, then confirm as Orbit Retail: grade C becomes B.",
         "docs": {
             "po": ("po", {**base, **orb, "po_number": "PO-OR-2210", "po_date": d(22), "items": po4_items}, 1, created(22)),
             "grn": ("grn", {**base, **orb, "grn_no": "GRN-OR-0981", "grn_date": d(9), "po_number": "PO-OR-2210",
