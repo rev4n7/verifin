@@ -498,3 +498,7 @@ details.samples summary{cursor:pointer;font-size:.85rem}
 .wordmark{height:44px;margin:-6px 0;width:auto;display:block;filter:drop-shadow(0 0 10px rgba(167,139,250,.35))}
 @media (max-width:860px){.wordmark{height:34px}}
 .hero-mark{display:block;height:clamp(64px,8vw,104px);width:auto;margin:0 0 6px -14px;filter:drop-shadow(0 0 24px rgba(167,139,250,.35))}
+
+/* hero without the product card */
+.landing{grid-template-columns:1fr;padding:56px 0 24px}
+.landing .lede{max-width:56ch}
