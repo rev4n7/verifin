@@ -1,0 +1,283 @@
+<title>VeriFin Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: single reading column (~72ch) with full-width diagram bands; ledger-ink palette, "verified" green + "flag" amber/red as semantic stamps */
+:root{
+  --bg:#f5f7f8; --surface:#ffffff; --ink:#122330; --muted:#566673; --line:#d9e0e4;
+  --accent:#0b6e5f; --accent-soft:#e1f1ed; --warn:#a15c00; --warn-soft:#fbefdc; --bad:#b3261e; --bad-soft:#fbe5e3;
+  --chain:#3b4fb8; --chain-soft:#e6e9fb;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", Consolas, ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f171d; --surface:#16212a; --ink:#e4ecf0; --muted:#9aabb6; --line:#2a3842;
+  --accent:#4cc3ad; --accent-soft:#143a34; --warn:#f0b35c; --warn-soft:#3a2b14; --bad:#f28b82; --bad-soft:#3d1c1a;
+  --chain:#9aa8ff; --chain-soft:#1f2650; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f171d; --surface:#16212a; --ink:#e4ecf0; --muted:#9aabb6; --line:#2a3842;
+  --accent:#4cc3ad; --accent-soft:#143a34; --warn:#f0b35c; --warn-soft:#3a2b14; --bad:#f28b82; --bad-soft:#3d1c1a;
+  --chain:#9aa8ff; --chain-soft:#1f2650; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--body);padding:0 16px}
+.wrap{max-width:860px;margin:0 auto;padding-block:40px 80px;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(2rem,5vw,3.1rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.65rem;font-weight:800;letter-spacing:-.01em}
+h3{font-size:1.1rem;font-weight:600}
+p{margin:0;max-width:68ch}
+.eyebrow{font:600 .75rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+section{display:flex;flex-direction:column;gap:18px}
+.lede{font-size:1.15rem;color:var(--muted)}
+.mono{font-family:var(--mono);font-size:.85em}
+code{font-family:var(--mono);font-size:.85em;background:var(--chain-soft);color:var(--chain);padding:1px 6px;border-radius:4px}
+.hero{display:flex;flex-direction:column;gap:16px}
+.stamp{align-self:flex-start;font:600 .8rem/1 var(--mono);letter-spacing:.08em;border:2px solid var(--accent);color:var(--accent);padding:6px 10px;border-radius:4px;transform:rotate(-2deg)}
+/* question grid */
+.qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.q b{font-family:var(--display);font-size:1.05rem}
+.q span{color:var(--muted);font-size:.92rem}
+.story{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.story .row{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.story .t{font:600 .8rem var(--mono);color:var(--muted);min-width:70px}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;counter-reset:s}
+.step{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;counter-increment:s;min-width:0}
+.step::before{content:"Step " counter(s);font:600 .7rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.step b{font-family:var(--display)}
+.step span{font-size:.88rem;color:var(--muted)}
+/* innovations */
+.inn{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;grid-template-columns:44px 1fr;gap:4px 16px}
+.card .ix{grid-row:span 3;font:800 1.6rem/1 var(--display);color:var(--accent)}
+.card p{color:var(--muted)}
+.card .why{font-size:.9rem;color:var(--ink)}
+.card .why::before{content:"Why judges care: ";font-weight:600;color:var(--accent)}
+/* architecture */
+.arch{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:640px){.arch{grid-template-columns:1fr}}
+.zone{border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.zone.off{background:var(--accent-soft);border:1px solid var(--accent)}
+.zone.on{background:var(--chain-soft);border:1px solid var(--chain)}
+.zone h3{font-size:1rem}
+.zone ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:.93rem}
+.never{background:var(--bad-soft);border:1px dashed var(--bad);color:var(--ink);border-radius:8px;padding:12px 16px;font-size:.93rem}
+.never b{color:var(--bad)}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.93rem;min-width:520px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 .72rem var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+.pill{display:inline-block;font:600 .72rem var(--mono);padding:2px 8px;border-radius:99px;white-space:nowrap}
+.pill.ok{background:var(--accent-soft);color:var(--accent)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+/* demo */
+ol.demo{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:d}
+ol.demo li{counter-increment:d;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px 14px 56px;position:relative}
+ol.demo li::before{content:counter(d);position:absolute;left:16px;top:14px;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--bg);font:700 .85rem/26px var(--mono);text-align:center}
+ol.demo .say{display:block;color:var(--muted);font-style:italic;margin-top:4px;font-size:.92rem}
+dl{margin:0;display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:8px 18px;font-size:.94rem}
+dt{font-weight:600}
+dd{margin:0;color:var(--muted)}
+@media (max-width:520px){dl{grid-template-columns:1fr}dd{margin-bottom:8px}}
+.qa{display:flex;flex-direction:column;gap:12px}
+.qa details{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 16px}
+.qa summary{cursor:pointer;font-weight:600}
+.qa summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.qa details p{margin-top:8px;color:var(--muted)}
+.src{font-size:.85rem;color:var(--muted)}
+.src a{color:var(--chain)}
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <span class="stamp">TEAM BRIEFING · READ FIRST</span>
+  <h1>VeriFin: verify the invoice, then fund it</h1>
+  <p class="lede">The problem statement in plain words, what we're building, why it's different from what other teams will build, and the exact demo we'll run for the judges.</p>
+</header>
+
+<section>
+  <span class="eyebrow">1 · The problem in one story</span>
+  <h2>A small business is owed money it can't use yet</h2>
+  <div class="story">
+    <div class="row"><span class="t">Day 0</span><span>Acme Precision Parts (a small supplier) delivers ₹5.9 lakh of brake components to Zenith Motors and sends an <b>invoice</b>. Payment terms: 60 days.</span></div>
+    <div class="row"><span class="t">Day 1</span><span>Acme needs cash <i>now</i> for salaries and raw material. It can't wait 60 days.</span></div>
+    <div class="row"><span class="t">Day 1</span><span><b>Invoice financing:</b> Acme takes the invoice to a lender. The lender pays ~85% today, and collects the full amount when Zenith pays on day 60. The lender keeps a fee.</span></div>
+  </div>
+  <p>Before handing over money, the lender has to answer four questions. Today this is done by people reading PDFs, which is slow and easy to fool:</p>
+  <div class="qgrid">
+    <div class="q"><b>Is the invoice real?</b><span>Or was the amount edited in a PDF editor?</span></div>
+    <div class="q"><b>Were goods delivered?</b><span>Does a purchase order and delivery receipt back it up?</span></div>
+    <div class="q"><b>Will the buyer pay?</b><span>How has this buyer paid in the past?</span></div>
+    <div class="q"><b>Is it financed elsewhere?</b><span>The same invoice taken to 3 lenders = 3× the cash, one repayment.</span></div>
+  </div>
+  <p>That last one, <b>duplicate (double) financing</b>, is the big one. Lenders can't see each other's books, so a fraudster can pledge one invoice to several of them. Commercial "fingerprint registries" exist to stop this (MonetaGo reports its fingerprinting is used by India's TReDS invoice platforms), but they are closed, vendor-run systems.</p>
+</section>
+
+<section>
+  <span class="eyebrow">2 · What we're building</span>
+  <h2>A platform that checks an invoice in seconds and explains every decision</h2>
+  <p>The SME uploads three documents: the <b>invoice</b>, the buyer's <b>purchase order (PO)</b>, and the signed <b>delivery receipt (GRN)</b>. VeriFin runs them through this pipeline:</p>
+  <div class="pipe">
+    <div class="step"><b>Extract</b><span>Read the PDFs into structured data: parties, tax IDs, items, totals, dates.</span></div>
+    <div class="step"><b>Forensics</b><span>Inspect the PDF file itself for signs it was edited after creation.</span></div>
+    <div class="step"><b>3-way match</b><span>Invoice vs PO vs delivery receipt: same items, quantities, prices, parties.</span></div>
+    <div class="step"><b>Duplicate shield</b><span>Same file? Same invoice re-scanned? Already funded by another lender?</span></div>
+    <div class="step"><b>Risk score</b><span>Buyer's payment history + red flags → 0–100 with reasons.</span></div>
+    <div class="step"><b>Decide &amp; price</b><span>Auto-approve, review, or reject. Advance % and fee set by risk.</span></div>
+    <div class="step"><b>Audit</b><span>Every step logged, hash-chained, and anchored on a blockchain.</span></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">3 · Why we win</span>
+  <h2>Eight ideas other teams won't have</h2>
+  <p>Most teams will build "OCR + store a hash on blockchain". These features go beyond that, and each one maps to a line in the brief.</p>
+  <div class="inn">
+    <div class="card"><span class="ix">1</span><h3>Cross-lender Double-Financing Shield</h3>
+      <p>We turn the invoice's key facts (seller tax ID, buyer tax ID, invoice number, amount, date) into a keyed fingerprint (HMAC). A re-scanned or re-typed copy gets the <i>same</i> fingerprint. When a lender funds an invoice, the fingerprint goes into a smart contract. Any other lender checking the same invoice is blocked, even though they never see the first lender's data.</p>
+      <p class="why">It solves the hardest problem in the brief, with an open, verifiable version of what banks already pay vendors for.</p></div>
+    <div class="card"><span class="ix">2</span><h3>PDF tamper forensics</h3>
+      <p>Edited PDFs leave traces: extra "save" sections appended to the file, a producer tool that differs from the seller's normal software, modification dates after creation dates. We read these and flag the invoice, with the evidence shown.</p>
+      <p class="why">It catches manipulated invoices before anyone reads the numbers.</p></div>
+    <div class="card"><span class="ix">3</span><h3>3-way match + PO over-billing ledger</h3>
+      <p>Each invoice line is matched against the PO and the delivery receipt. We also keep a running total of how much has been invoiced against every PO, so a "new" invoice that re-bills an already-billed PO gets caught even with a fresh invoice number.</p>
+      <p class="why">It proves goods were delivered, and catches split or re-numbered invoices that simple duplicate checks miss.</p></div>
+    <div class="card"><span class="ix">4</span><h3>Buyer confirmation on-chain</h3>
+      <p>The buyer (Zenith) gets a one-click "I confirm I owe this" action that records a confirmation against the fingerprint on-chain. A confirmed invoice gets a better score and a higher advance.</p>
+      <p class="why">It turns "the buyer is likely to pay" from a guess into an attested fact.</p></div>
+    <div class="card"><span class="ix">5</span><h3>Selective-disclosure proofs</h3>
+      <p>Each invoice field is salted, hashed, and combined into a Merkle tree. Only the root goes on-chain. The SME can share a proof card such as "amount = ₹5,90,000, buyer = Zenith, due 12 Dec" with an auditor or second lender, who can check it against the chain <i>without</i> seeing line items, prices or anything else.</p>
+      <p class="why">It answers the brief's "without exposing sensitive documents unnecessarily", which most teams will ignore.</p></div>
+    <div class="card"><span class="ix">6</span><h3>Charged vs. paid vs. claimed</h3>
+      <p>We reconcile the invoice (what was charged) against the seller's bank statement (what was actually paid) and their statement of account (what they claim is outstanding). This catches the classic fraud of pledging an invoice the buyer has already paid. In production the bank statement comes through India's Account Aggregator framework, so the seller can't edit it.</p>
+      <p class="why">It's the only way to know the receivable still exists, and no other check covers it.</p></div>
+    <div class="card"><span class="ix">7</span><h3>Evidence that travels: credit pack + signed record</h3>
+      <p>Every check shows the rule applied, a confidence level and the discrepancy in rupees, down to the line. The lender gets a credit pack that separates "what supports eligibility" from "what still needs review". Anyone (buyer, auditor, another lender) gets a signed, blockchain-anchored Verification Record they can check offline, without trusting or contacting us.</p>
+      <p class="why">It turns verification into proof other parties can rely on.</p></div>
+    <div class="card"><span class="ix">8</span><h3>Red-Team Lab + explainable decisions</h3>
+      <p>A demo panel with one button per fraud attack (re-scan &amp; double-pledge, inflated amount, edited PDF, re-billed PO, tampered audit log). Each run shows the attack being caught live. Every decision comes with a plain-English memo and the points behind the score.</p>
+      <p class="why">Judges see the system work instead of hearing about it, and every rejection can be explained to a regulator.</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">3b · How we compare</span>
+  <h2>Pieces exist. Nobody joins them up.</h2>
+  <p>Judges may ask "doesn't this already exist?" Yes, parts of it do, which shows the problem is real. Each existing tool covers one slice:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Product</th><th>What it does</th><th>What it doesn't do</th></tr></thead>
+    <tbody>
+      <tr><td><b>MonetaGo</b></td><td>Closed fingerprint registry banks pay to join; reports TReDS platforms use it</td><td>No verification, risk, pricing or audit. Vendor-controlled. Can't catch a renumbered invoice.</td></tr>
+      <tr><td><b>Billacle</b></td><td>AP automation for a buyer's finance team: AI invoice capture, approvals, GST/ITC reconciliation, Tally sync</td><td>Not a lending product. Duplicate checks stay inside one company's books. No cross-lender view, risk, or audit proof.</td></tr>
+      <tr><td><b>TReDS platforms</b></td><td>RBI-regulated marketplaces where MSMEs auction invoices to financiers</td><td>Each platform is its own silo, and verification relies on buyer acceptance plus manual checks.</td></tr>
+      <tr><td><b>VeriFin</b></td><td>Full pipeline: extraction → forensics → 3-way match → 4-layer dedup → risk → pricing → anchored audit</td><td>Open registry, buyer attestation and selective disclosure, in one working demo.</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Line to use:</b> "AP tools like Billacle live on the buyer's side. In production, that's where our buyer confirmation would come from. MonetaGo proves banks pay for duplicate checks. We made that open and verifiable, and built the whole lending decision around it."</p>
+</section>
+
+<section>
+  <span class="eyebrow">4 · The hybrid audit architecture</span>
+  <h2>What lives off-chain, what lives on-chain</h2>
+  <p>"Hybrid" means the heavy, private stuff stays in our own encrypted storage. Only tiny cryptographic fingerprints go on the blockchain, which acts as a public notary nobody (including us) can quietly rewrite.</p>
+  <div class="arch">
+    <div class="zone off"><h3>Off-chain (private)</h3>
+      <ul>
+        <li>Original PDFs, <b>encrypted at rest</b></li>
+        <li>Extracted data, scores, decisions</li>
+        <li>Audit log: every event hash-chained to the previous one (<code>hash = H(prev + event)</code>)</li>
+        <li>Buyer payment history</li>
+      </ul></div>
+    <div class="zone on"><h3>On-chain (public, tamper-proof)</h3>
+      <ul>
+        <li>Invoice fingerprints + status (funded / repaid)</li>
+        <li>Buyer confirmations</li>
+        <li>Merkle roots of audit-log batches (one tx covers many events)</li>
+        <li>Field-level commitment roots for selective disclosure</li>
+      </ul></div>
+  </div>
+  <p class="never"><b>Never on-chain:</b> names, amounts, line items, tax IDs or files. Fingerprints are keyed hashes, so nobody can guess invoice details by brute-forcing them.</p>
+  <p>How tampering gets caught: if anyone edits a stored file, its hash no longer matches the one recorded in the audit log. If anyone edits the audit log, the hash chain breaks <i>and</i> the batch's Merkle root no longer matches the one on the blockchain. The "Verify integrity" button recomputes all of it in one click.</p>
+</section>
+
+<section>
+  <span class="eyebrow">5 · Brief → feature map</span>
+  <h2>Every bullet in the problem statement is covered</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Brief asks for</th><th>VeriFin feature</th></tr></thead>
+    <tbody>
+      <tr><td>Invoice data extraction</td><td>PDF parser (offline) + optional Claude AI extraction for any layout</td></tr>
+      <tr><td>Cross-checks vs PO, delivery, contracts</td><td>3-way match with line-level evidence; PO over-billing ledger</td></tr>
+      <tr><td>Duplicate detection</td><td>File hash → fuzzy match → keyed fingerprint → on-chain cross-lender registry</td></tr>
+      <tr><td>Risk from payment history &amp; receivables</td><td>Explainable scorecard: buyer delay, default rate, concentration, size anomaly, buyer confirmation</td></tr>
+      <tr><td>Off-chain files, on-chain hashes</td><td>Encrypted file store + hash-chained log + Merkle anchoring to a Solidity contract</td></tr>
+      <tr><td>Explainable, automated workflow</td><td>State machine (Submitted → Verified → Approved → Funded → Repaid), decision memo, risk-based pricing</td></tr>
+      <tr><td>Don't expose sensitive docs</td><td>Selective-disclosure proofs; only keyed hashes on-chain</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <span class="eyebrow">6 · The 3-minute demo</span>
+  <h2>Run it in this order</h2>
+  <ol class="demo">
+    <li><b>Happy path.</b> Acme submits invoice + PO + delivery receipt to <b>Lender A</b>. All checks go green, score 86 (grade A), auto-approved at 90% advance. Click <b>Disburse</b>, and the fingerprint goes on-chain.
+      <span class="say">"Under 5 seconds from upload to an explained, priced decision."</span></li>
+    <li><b>Double-pledge.</b> The same invoice, re-scanned as a different file, goes to <b>Lender B</b>. Lender B's own books are clean, but the on-chain registry says it's already funded. Rejected.
+      <span class="say">"Lender B never saw Lender A's data. Only a keyed fingerprint was shared."</span></li>
+    <li><b>Inflated invoice.</b> The invoice says 150 units, but the PO and delivery receipt say 100. The 3-way match fails line by line, and forensics flags the PDF as edited.
+      <span class="say">"We don't just say 'suspicious', we show which line and which field."</span></li>
+    <li><b>Risky buyer.</b> A clean invoice to a buyer who pays 45 days late on average. Routed to manual review at 75% advance (score 53, grade C). Then the buyer confirms on-chain: score 65, grade B, 85% advance.
+      <span class="say">"Price follows risk, and the reason is written down."</span></li>
+    <li><b>Already-paid invoice.</b> Zenith paid INV-2026-1004 five days ago, but Acme pledges it anyway with a statement of account that leaves the payment out. The bank statement shows the payment, and the statement is overstated by ₹2,36,000. Blocked.
+      <span class="say">"Charged, paid, claimed: we check all three agree."</span></li>
+    <li><b>Portable record.</b> Open the funded invoice, go to Verification record, issue it, and verify it. Then forge the decision and watch the signature fail.
+      <span class="say">"Any auditor can check this offline, without trusting us."</span></li>
+    <li><b>Insider tampering.</b> In the Red-Team Lab, edit a stored document and an audit record, then click <b>Verify integrity</b>. It pinpoints the broken record and shows the on-chain root mismatch.
+      <span class="say">"Even we can't rewrite history without it showing."</span></li>
+    <li><b>Privacy.</b> Generate a selective-disclosure proof card revealing only amount + due date, and verify it against the chain.</li>
+  </ol>
+</section>
+
+<section>
+  <span class="eyebrow">7 · Glossary</span>
+  <h2>Words you'll need on stage</h2>
+  <dl>
+    <dt>Invoice financing / factoring</dt><dd>A lender advances cash against an unpaid invoice and collects when the buyer pays.</dd>
+    <dt>Purchase order (PO)</dt><dd>The buyer's official order: items, quantities, agreed prices.</dd>
+    <dt>GRN / delivery receipt</dt><dd>Goods Received Note, the buyer's signed proof that goods arrived.</dd>
+    <dt>3-way match</dt><dd>Checking invoice, PO and GRN against each other.</dd>
+    <dt>GSTIN</dt><dd>India's 15-character GST tax ID, which identifies each business.</dd>
+    <dt>TReDS</dt><dd>RBI-regulated platforms (RXIL, M1xchange, Invoicemart) where MSMEs sell invoices to lenders.</dd>
+    <dt>Hash</dt><dd>A short digital fingerprint of data. Change one byte and the hash changes completely.</dd>
+    <dt>HMAC fingerprint</dt><dd>A hash made with a secret key shared by the lender network, so outsiders can't guess what's inside.</dd>
+    <dt>Hash chain</dt><dd>Each log entry includes the previous entry's hash, so editing any entry breaks every link after it.</dd>
+    <dt>Merkle root</dt><dd>One hash that summarises many items. You can prove one item is included without revealing the others.</dd>
+    <dt>Anchoring</dt><dd>Writing a Merkle root to the blockchain as a timestamped, unchangeable receipt.</dd>
+    <dt>Advance rate</dt><dd>The share of the invoice paid out upfront (e.g. 85%).</dd>
+    <dt>DSO / days late</dt><dd>How long a buyer takes to pay, which drives risk.</dd>
+  </dl>
+</section>
+
+<section>
+  <span class="eyebrow">8 · Judge Q&amp;A prep</span>
+  <h2>Questions you'll likely get</h2>
+  <div class="qa">
+    <details><summary>Why blockchain, and not just a shared database?</summary><p>Competing lenders won't trust a database run by one of them. A blockchain gives a neutral, append-only registry that no single party controls or can quietly edit. We only use it for what needs that property: fingerprints, confirmations and audit roots.</p></details>
+    <details><summary>Can't someone change the invoice number to dodge the fingerprint?</summary><p>Then the fuzzy matcher (same seller, buyer, amount and date window) and the PO over-billing ledger catch it, because the PO has already been billed. The defences are layered on purpose.</p></details>
+    <details><summary>Isn't putting hashes on a public chain a privacy leak?</summary><p>Plain hashes of guessable fields could be brute-forced, so we use a keyed HMAC with a key held by the lender network. On-chain data reveals nothing without that key.</p></details>
+    <details><summary>Which chain would you use in production?</summary><p>A permissioned EVM chain run by the lender network (e.g. Hyperledger Besu) or a low-cost L2. The demo uses a local Ethereum node (Hardhat) with the same Solidity contract.</p></details>
+    <details><summary>What about scanned or non-standard invoices?</summary><p>The extractor has an AI path (Claude reads any invoice layout into structured data). In production we'd also pull the GST e-invoice IRN and e-way bill for government-backed confirmation.</p></details>
+    <details><summary>How is the risk score decided?</summary><p>It's a transparent scorecard, not a black box. Each factor adds or removes points and the memo lists them. With real data, the weights would be fitted on historical repayments.</p></details>
+  </div>
+</section>
+
+<p class="src"><a href="https://billacle.com/">Billacle</a> · Background sources: <a href="https://www.businesswire.com/news/home/20220428005053/en/MonetaGo-Delivers-Major-Milestones-in-Strategy-for-Trade-Finance-De-duplication-in-India-Sets-the-Stage-for-Global-Adoption-in-2022">MonetaGo de-duplication (Business Wire)</a> · <a href="https://www.gtreview.com/news/asia/blockchain-solution-aims-to-stop-trade-invoice-fraud/">GTR on blockchain invoice registries</a> · <a href="https://dev.to/iurii_rogulia/detect-pdf-tampering-programmatically-developer-guide-2ohb">PDF tamper detection guide</a> · <a href="https://arxiv.org/pdf/2401.08196">Selective disclosure mechanisms (arXiv)</a></p>
+
+</div>

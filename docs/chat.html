@@ -1,0 +1,286 @@
+<title>VeriFin Build Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; a "start here" brief, then the conversation as a chat thread grouped into chapters. Dark-first, VeriFin glass blue. */
+:root{
+  color-scheme:dark;
+  --bg:#06102a; --panel:#0e1b3d; --panel-2:#13244d; --ink:#eef3ff; --ink-2:#c3d0ea; --muted:#8ea1c4; --line:rgba(255,255,255,.10);
+  --blue:#4aa8ff; --teal:#3fe0d0; --user:#1f6fff; --user-ink:#ffffff; --bad:#ff8a8a; --ok:#4ade9b;
+  --sans:"Geist",-apple-system,"Segoe UI",system-ui,sans-serif; --mono:"Geist Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --bg:#eef4fc; --panel:#ffffff; --panel-2:#f3f7fd; --ink:#0b1b33; --ink-2:#2c3e5a; --muted:#5b6b84; --line:rgba(16,56,120,.12);
+  --blue:#0a6cff; --teal:#0a9e90; --user:#0a6cff; --user-ink:#ffffff; --bad:#c4001a; --ok:#0f8a4a;}}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#eef4fc; --panel:#ffffff; --panel-2:#f3f7fd; --ink:#0b1b33; --ink-2:#2c3e5a; --muted:#5b6b84; --line:rgba(16,56,120,.12);
+  --blue:#0a6cff; --teal:#0a9e90; --user:#0a6cff; --user-ink:#ffffff; --bad:#c4001a; --ok:#0f8a4a;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15.5px/1.6 var(--sans);letter-spacing:-.005em;padding-inline:16px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding-block:40px 80px;display:flex;flex-direction:column;gap:40px}
+h1,h2,h3{margin:0;letter-spacing:-.025em;line-height:1.15;text-wrap:balance}
+h1{font-size:clamp(2rem,5vw,2.8rem);font-weight:800}
+h2{font-size:1.45rem;font-weight:700}
+h3{font-size:1.02rem;font-weight:600}
+p{margin:0}
+a{color:var(--blue)}
+code,.mono{font-family:var(--mono);font-size:.86em}
+code{background:var(--panel-2);padding:1px 6px;border-radius:6px;word-break:break-all}
+.eyebrow{font-size:.78rem;font-weight:600;color:var(--teal);margin-bottom:6px;display:block}
+.lede{color:var(--ink-2);font-size:1.05rem;margin-top:12px;max-width:62ch}
+header .meta{color:var(--muted);font-size:.85rem;margin-top:10px}
+
+.brief{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:20px}
+.brief-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:640px){.brief-grid{grid-template-columns:1fr}}
+.brief-grid > div{min-width:0;display:flex;flex-direction:column;gap:8px}
+.brief ul,.brief ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;color:var(--ink-2);font-size:.93rem}
+.links{display:flex;flex-wrap:wrap;gap:8px}
+.links a{text-decoration:none;font-weight:600;font-size:.88rem;background:var(--panel-2);border:1px solid var(--line);padding:7px 12px;border-radius:999px}
+.quote{border-left:3px solid var(--teal);padding:4px 0 4px 14px;color:var(--ink);font-size:.95rem}
+
+.toc{display:flex;flex-wrap:wrap;gap:6px}
+.toc a{font-size:.8rem;text-decoration:none;color:var(--ink-2);background:var(--panel);border:1px solid var(--line);padding:5px 11px;border-radius:999px}
+.toc a:hover{color:var(--ink)}
+
+.chapter{display:flex;flex-direction:column;gap:14px;scroll-margin-top:20px}
+.chapter > h2{display:flex;align-items:baseline;gap:10px}
+.chapter > h2 span{font:500 .8rem var(--mono);color:var(--muted)}
+.msg{display:flex;flex-direction:column;gap:6px;max-width:92%;min-width:0}
+.msg .who{font-size:.74rem;font-weight:600;color:var(--muted)}
+.bubble{border-radius:20px;padding:14px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.user{align-self:flex-end;align-items:flex-end}
+.user .bubble{background:var(--user);color:var(--user-ink);border-bottom-right-radius:6px}
+.user .bubble a{color:var(--user-ink)}
+.claude{align-self:flex-start}
+.claude .bubble{background:var(--panel);border:1px solid var(--line);border-bottom-left-radius:6px}
+.claude .bubble ul,.claude .bubble ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.bubble img{border-radius:12px}
+details.pasted{background:rgba(255,255,255,.12);border-radius:12px;padding:8px 12px;font-size:.88rem}
+.claude details.pasted{background:var(--panel-2)}
+details.pasted summary{cursor:pointer;font-weight:600}
+details.pasted p{margin-top:8px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:.86rem;min-width:480px}
+th,td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--panel-2)}
+tr:last-child td{border-bottom:0}
+.tag{display:inline-block;font-size:.72rem;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--panel-2);color:var(--teal);border:1px solid var(--line)}
+.note{font-size:.84rem;color:var(--muted)}
+footer{color:var(--muted);font-size:.84rem;border-top:1px solid var(--line);padding-top:18px}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">Hackathon build log · invoice financing</span>
+  <h1>VeriFin Build Log</h1>
+  <p class="lede">The full working conversation that produced VeriFin: the problem, every decision, the features we added after feedback, and how to run and pitch it. Read "Start here" first if you're short on time.</p>
+  <p class="meta">13 October 2026 · built with Claude Code · replies condensed, decisions and numbers kept exactly</p>
+</header>
+
+<section class="brief" id="start">
+  <h2>Start here</h2>
+  <div class="links">
+    <a href="https://claude.ai/artifact/NciMW2nWF6AVx18u8gfR9C">Team explainer (problem, solution, Q&amp;A)</a>
+  </div>
+  <div class="brief-grid">
+    <div>
+      <h3>What VeriFin is</h3>
+      <p class="note">An invoice-financing platform. It verifies an invoice in seconds against the purchase order, delivery receipt, bank statement and every other lender, prices the advance from the buyer's payment history, and records each step in a tamper-evident audit trail anchored on a blockchain.</p>
+      <h3>Workspaces in the app</h3>
+      <ul>
+        <li><b>Lenders</b> (Shakti Bank, Kaveri Capital): dashboard, applications, audit</li>
+        <li><b>Business</b> (Acme): invoice tracker, upload</li>
+        <li><b>Buyers</b> (Zenith, Orbit): confirm or dispute invoices</li>
+        <li><b>Independent verifier</b>: check any record or document</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Run it</h3>
+      <ol>
+        <li>On the build laptop, double-click <code>C:\Users\asus\verifin\start.bat</code>.</li>
+        <li>It opens the blockchain node and the app, then the browser at <code>http://localhost:8000</code>.</li>
+        <li>Press <b>P</b> (or the faint ▶ bottom-right) for the presenter drawer with live scenarios and reset.</li>
+      </ol>
+      <h3>Stage flow</h3>
+      <ol>
+        <li>Homepage → "Choose your workspace"</li>
+        <li>P → run 01 → <b>Disburse</b> → run 02 (blocked on-chain)</li>
+        <li>Run 03, 05, 06 → Shakti Bank dashboard shows blocked frauds</li>
+        <li>Run 04 → request confirmation → switch to Orbit Retail → Confirm → score 53 → 65</li>
+        <li>Acme's invoice timeline → signed record → public verifier</li>
+        <li>Insider attacks → Verify integrity</li>
+      </ol>
+    </div>
+  </div>
+  <div>
+    <h3 style="margin-bottom:8px">Opening line for the judges</h3>
+    <p class="quote">"Before funding an invoice, a lender needs four answers: is it real, was it delivered, will the buyer pay, and is it already financed elsewhere. Today those answers come from separate tools owned by separate parties, and nobody else can check them. VeriFin answers all four in seconds, explains each answer with evidence down to the line and the rupee, and produces a signed record that any lender, buyer or auditor can verify independently."</p>
+  </div>
+</section>
+
+<nav class="toc" aria-label="Chapters">
+  <a href="#c1">1 · Brief &amp; plan</a><a href="#c2">2 · Stack &amp; research</a><a href="#c3">3 · First build</a><a href="#c4">4 · "Doesn't this exist?"</a><a href="#c5">5 · Mentor feedback</a><a href="#c6">6 · Pitch wording</a><a href="#c7">7 · Payment reconciliation</a><a href="#c8">8 · Design</a><a href="#c9">9 · Bug on stage path</a><a href="#c10">10 · Final product</a><a href="#c11">11 · Sharing</a>
+</nav>
+
+<section class="chapter" id="c1">
+  <h2><span>01</span>Brief &amp; plan</h2>
+  <div class="msg user"><span class="who">Team</span><div class="bubble">
+    <p>Heyyy so we are in the middle of a hackathon and this is our problem statement:</p>
+    <details class="pasted"><summary>Invoice Financing with Hybrid Audit Architecture</summary>
+      <p>Small and medium-sized businesses face cash-flow constraints because customer payments can take weeks or months to arrive. Lenders offering invoice financing must confirm that an invoice is genuine, that goods or services were delivered, that the buyer is likely to pay, and that the invoice has not been financed elsewhere. Fragmented documents and manual checks lead to duplicate financing, manipulated invoices, delayed approvals, and disputes.</p>
+      <p>Your challenge: develop an intelligent invoice-financing platform that evaluates invoice authenticity, assesses financing risk, identifies potential duplication, and maintains a verifiable history of important events through a hybrid audit architecture. It could support: invoice data extraction from uploaded documents; cross-checks against purchase orders, delivery receipts, and contracts; duplicate invoice detection across repeated submissions; financing risk assessment from buyer payment history and receivables; hybrid audit (off-chain files with tamper-evident on-chain hashes); explainable verification and an automated financing workflow.</p>
+      <p>Goal: build a working prototype of a trustworthy invoice-financing platform that automates verification, detects duplicate or inconsistent claims, supports risk-based financing decisions, and keeps a tamper-evident audit history without exposing sensitive documents unnecessarily.</p>
+    </details>
+  </div></div>
+  <div class="msg claude"><span class="who">Claude</span><div class="bubble">
+    <p>Proposed a pipeline: <b>extract → 3-way match (invoice, PO, delivery) → duplicate check → risk score → decision → audit</b>, with every step logged to a hash chain and anchored on-chain.</p>
+    <ul>
+      <li><b>Canonical fingerprint</b>: hash of seller GSTIN, buyer GSTIN, invoice number, amount and date, so a re-scanned copy still matches. Stored in a smart contract, so a second lender is blocked without seeing anyone's data.</li>
+      <li><b>Hybrid audit</b>: encrypted files off-chain, hash-chained events, Merkle roots on-chain, and a live "tamper one byte" demo.</li>
+      <li><b>Explainable scorecard</b>: every point traceable, turned into an advance rate and fee.</li>
+    </ul>
+    <p>Asked for time left, stack constraints, and whether to start building.</p>
+  </div></div>
+</section>
+
+<section class="chapter" id="c2">
+  <h2><span>02</span>Stack &amp; research</h2>
+  <div class="msg user"><span class="who">Team</span><div class="bubble"><p>time left 3 hours 2. whats best and whats on my sys 3. start working now</p></div></div>
+  <div class="msg claude"><span class="who">Claude</span><div class="bubble">
+    <p>Checked the laptop: Python 3.12, Node 24 and git present; no Docker, no Anthropic API key. Chose a stack with few ways to fail: <b>FastAPI + SQLite</b>, a <b>Solidity contract on a local Hardhat chain</b> (with a simulated fallback), a <b>no-build frontend</b>, and an offline PDF parser with optional Claude extraction. Started installs.</p>
+  </div></div>
+  <div class="msg user"><span class="who">Team</span><div class="bubble"><p>also please make it unique and really innovative. research for solutions that will get us the win</p></div></div>
+  <div class="msg user"><span class="who">Team</span><div class="bubble"><p>also we have no idea what the problem statement and the solution you propose so i need an explainer</p></div></div>
+  <div class="msg claude"><span class="who">Claude</span><div class="bubble">
+    <p>Research findings that shaped the features:</p>
+    <ul>
+      <li>Duplicate financing is a real, paid-for problem: vendors like MonetaGo sell closed fingerprint registries to banks and TReDS platforms. Ours is an open on-chain registry.</li>
+      <li>Edited PDFs leave traces (extra save sections, editor tools as producer, odd timestamps), so PDF forensics catches manipulated invoices.</li>
+      <li>Merkle selective disclosure lets a seller prove chosen fields without revealing the rest.</li>
+    </ul>
+    <p>Published the team explainer: <a href="https://claude.ai/artifact/NciMW2nWF6AVx18u8gfR9C">claude.ai/artifact/NciMW2nWF6AVx18u8gfR9C</a>.</p>
+  </div></div>
+</section>
+
+<section class="chapter" id="c3">
+  <h2><span>03</span>First build</h2>
+  <div class="msg claude"><span class="who">Claude</span><div class="bubble">
+    <p>Built and verified end to end on a real local chain. Five scenarios, each a set of generated PDFs:</p>
+    <div class="tbl"><table>
+      <tr><th>Scenario</th><th>Result</th></tr>
+      <tr><td>Genuine invoice</td><td>Score 86 (A), auto-approved, 90% advance; disbursal registers it on-chain</td></tr>
+      <tr><td>Same invoice re-issued to a second lender</td><td>Blocked by the on-chain registry</td></tr>
+      <tr><td>Inflated invoice (150 billed, 100 delivered, price ₹400 → ₹450)</td><td>Blocked: line mismatch + PDF edited in iLovePDF</td></tr>
+      <tr><td>Slow-paying buyer</td><td>Manual review at 75%; buyer confirmation lifts it 53 → 65</td></tr>
+      <tr><td>Same delivery billed under a new number</td><td>Blocked: PO billed at 200%</td></tr>
+    </table></div>
+    <p>Plus insider tampering detection (pinpoints the edited record, the on-chain root mismatch and the altered file) and selective-disclosure proofs.</p>
+  </div></div>
+</section>
+
+<section class="chapter" id="c4">
+  <h2><span>04</span>"Doesn't this exist?"</h2>
+  <div class="msg user"><span class="who">Team</span><div class="bubble"><p>the idea already exists it seems</p></div></div>
+  <div class="msg claude"><span class="who">Claude</span><div class="bubble">
+    <p>Parts of it do, which shows the problem is real. MonetaGo, TFM's Invoice Check and the TReDS platforms each cover one slice. VeriFin's edge: an open registry instead of a vendor one, a full pipeline instead of a dedup check alone, four duplicate layers, selective disclosure, on-chain buyer confirmation, and a provable audit trail.</p>
+  </div></div>
+  <div class="msg user"><span class="who">Team</span><div class="bubble"><p>how does it differ from billacle?</p></div></div>
+  <div class="msg claude"><span class="who">Claude</span><div class="bubble">
+    <p>Billacle is accounts-payable automation for a buyer's finance team: invoice capture, approvals, GST/ITC reconciliation, Tally sync. It decides whether a company should pay a bill. VeriFin decides whether a lender should advance money against one, across lenders that can't see each other. The only overlap is invoice extraction.</p>
+    <p class="quote">"AP tools like Billacle live on the buyer's side. In production, that's where our buyer confirmation would come from."</p>
+  </div></div>
+</section>
+
+<section class="chapter" id="c5">
+  <h2><span>05</span>Mentor feedback</h2>
+  <div class="msg user"><span class="who">Team</span><div class="bubble">
+    <details class="pasted" open><summary>Feedback: where the idea could stand out</summary>
+      <p><b>A. Evidence-backed trust score:</b> show every check, its evidence, confidence and the reason for any failure.</p>
+      <p><b>B. Portable verification record:</b> something another authorised party can check independently.</p>
+      <p><b>C. Verification that leads to a financing decision:</b> a lender-ready evidence package.</p>
+    </details>
+  </div></div>
+  <div class="msg claude"><span class="who">Claude</span><div class="bubble">
+    <ul>
+      <li><b>A:</b> every check now carries a rule ID and version, confidence, sources and the discrepancy in rupees, for example "Invoice is ₹77,500 (₹91,450 incl. GST) above what the PO and delivery support."</li>
+      <li><b>B:</b> a signed (Ed25519), W3C-credential-style record anchored on-chain, plus <code>tools/verify_record.py</code>, which checks it offline against the contract. Forging any field fails.</li>
+      <li><b>C:</b> a credit pack separating "what supports eligibility" from "what still needs lender review", with buyer acceptance, payment history, receivables and conditions before disbursal.</li>
+    </ul>
+  </div></div>
+</section>
+
+<section class="chapter" id="c6">
+  <h2><span>06</span>Pitch wording</h2>
+  <div class="msg user"><span class="who">Team</span><div class="bubble"><p>since all of them already exist our job is to build the best version outta it. is this a good explanation to the judge?</p></div></div>
+  <div class="msg user"><span class="who">Team</span><div class="bubble"><p>you didnt answer my question</p></div></div>
+  <div class="msg claude"><span class="who">Claude</span><div class="bubble">
+    <p><b>No, not as worded.</b> It isn't accurate (pieces exist, the whole doesn't), it invites "so what's new?", and "best" is a claim judges can't check.</p>
+    <p class="quote">"The individual checks exist in separate tools, each owned by a different party. None of them talk to each other, and nobody can verify another party's result. We built one system that does all the checks and produces proof any lender, buyer or auditor can verify on their own."</p>
+    <p>Only bring up competitors if a judge asks.</p>
+  </div></div>
+</section>
+
+<section class="chapter" id="c7">
+  <h2><span>07</span>Payment reconciliation</h2>
+  <div class="msg user"><span class="who">Team</span><div class="bubble">
+    <p>Your platform could verify the relationship between all three: Invoice (what was charged?), payment evidence (what was actually paid?), account statement (what does the company claim is outstanding?)</p>
+  </div></div>
+  <div class="msg claude"><span class="who">Claude</span><div class="bubble">
+    <p>Added it: it catches <b>pledging an invoice the buyer already paid</b>, which no other check covered.</p>
+    <ul>
+      <li>Bank statement (in production via RBI's Account Aggregator framework, so the SME can't edit it) vs. the seller's statement of account.</li>
+      <li>Checks: already paid, statement arithmetic, payments missing from the statement, outstanding overstated in ₹.</li>
+      <li>Scenario 6: Zenith paid INV-2026-1004 five days ago; Acme pledges it anyway. Blocked, "overstated by ₹2,36,000".</li>
+    </ul>
+  </div></div>
+</section>
+
+<section class="chapter" id="c8">
+  <h2><span>08</span>Design</h2>
+  <div class="msg user"><span class="who">Team</span><div class="bubble"><p>i like it but improve the design. its quite vague like gov websites. take inspiration from apple design philosophy and newer designs. i mean the judge must ask for my number when he sees it</p></div></div>
+  <div class="msg user"><span class="who">Team</span><div class="bubble"><p>use glass blue as theme · like this (shared a reference: deep navy with flowing blue and teal light, frosted textured glass)</p></div></div>
+  <div class="msg claude"><span class="who">Claude</span><div class="bubble">
+    <p>Redesigned to match the reference: deep navy with drifting blue and teal light, a frosted texture and fine grain, dark glass cards, a frosted top bar with segmented navigation, Geist type, animated gradient score rings, and a hero "product shot" of an invoice whose checks tick in one by one.</p>
+  </div></div>
+</section>
+
+<section class="chapter" id="c9">
+  <h2><span>09</span>Bug on the stage path</h2>
+  <div class="msg user"><span class="who">Team</span><div class="bubble"><p>whats this??????? (screenshot: scenario 02, the double pledge, showing "Auto-approved")</p></div></div>
+  <div class="msg claude"><span class="who">Claude</span><div class="bubble">
+    <p>A real bug. Scenario 01 was approved but never disbursed, so nothing was on-chain yet, and the automatic setup step submitted a second copy instead of disbursing the first. Fixed: 02 now funds the existing invoice first, and card 01 has an inline "Disburse &amp; register on-chain" button. All click orders tested.</p>
+    <p class="note">Judge follow-up to prepare: "What if two lenders review it at the same time?" Answer: in production a pending claim (soft lock) is registered at submission.</p>
+  </div></div>
+</section>
+
+<section class="chapter" id="c10">
+  <h2><span>10</span>Final product</h2>
+  <div class="msg user"><span class="who">Team</span><div class="bubble"><p>okay but we want it like a final product not just a simulation</p></div></div>
+  <div class="msg claude"><span class="who">Claude</span><div class="bubble">
+    <ul>
+      <li><b>Workspace switcher</b> next to the logo, like Slack or Linear.</li>
+      <li><b>Lender dashboard</b>: ₹ disbursed, live exposure, approval rate, ₹ fraud blocked, average decision time (about 0.2 s), attention queue, blocked list, exposure by buyer, ledger status.</li>
+      <li><b>Business tracker</b>: Submitted → Verified → Offer → Funded → Repaid timeline per invoice.</li>
+      <li><b>Buyer inbox</b>: Confirm (signed on-chain) or Dispute with a reason. Buyer confirmation is now a real two-party action.</li>
+      <li><b>Public verifier</b> for records and documents.</li>
+      <li>Demo tools moved into a hidden presenter drawer (press P). No "demo" wording on the product screens.</li>
+    </ul>
+  </div></div>
+</section>
+
+<section class="chapter" id="c11">
+  <h2><span>11</span>Sharing</h2>
+  <div class="msg user"><span class="who">Team</span><div class="bubble"><p>okay how do i share this chat with my teammate? · okay where is the app? · can you make the chat as an artifact so i can send it?</p></div></div>
+  <div class="msg claude"><span class="who">Claude</span><div class="bubble">
+    <p>The app runs locally at <code>http://localhost:8000</code> on the build laptop while the servers are up; <code>start.bat</code> restarts everything. The raw transcript was exported as a zip to the Downloads folder, and this page is the readable version.</p>
+  </div></div>
+</section>
+
+<footer>
+  Code lives in <code>C:\Users\asus\verifin</code> on the build laptop: <code>backend/</code> (Python API and verification engines), <code>chain/</code> (Solidity contract), <code>frontend/</code> (the app), <code>tools/verify_record.py</code> (offline verifier), <code>README.md</code> (setup and demo script). The data in the app is synthetic: companies, GSTINs and payment histories are fictional, and the risk weights are hand-set.
+</footer>
+</div>

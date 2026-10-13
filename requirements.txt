@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pdfplumber
+pypdf
+reportlab
+web3
+rapidfuzz
+cryptography
+anthropic

@@ -1,0 +1,321 @@
+<title>VeriFin User Manual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky contents rail + one reading column of numbered steps, each with an annotated screenshot. Dark-first to match the app; yellow step markers mirror the highlights in the screenshots. */
+:root{
+  color-scheme:dark;
+  --bg:#06102a; --panel:#0e1b3d; --panel-2:#142650; --ink:#eef3ff; --ink-2:#c3d0ea; --muted:#8ea1c4; --line:rgba(255,255,255,.10);
+  --blue:#4aa8ff; --teal:#3fe0d0; --mark:#ffd60a; --mark-ink:#111111; --bad:#ff8a8a; --ok:#4ade9b;
+  --sans:"Geist",-apple-system,"Segoe UI",system-ui,sans-serif; --mono:"Geist Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --bg:#eef4fc; --panel:#ffffff; --panel-2:#f2f6fd; --ink:#0b1b33; --ink-2:#2c3e5a; --muted:#5b6b84; --line:rgba(16,56,120,.12);
+  --blue:#0a6cff; --teal:#0a8f82; --mark:#ffd60a; --mark-ink:#111111; --bad:#c4001a; --ok:#0f8a4a;}}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#eef4fc; --panel:#ffffff; --panel-2:#f2f6fd; --ink:#0b1b33; --ink-2:#2c3e5a; --muted:#5b6b84; --line:rgba(16,56,120,.12);
+  --blue:#0a6cff; --teal:#0a8f82; --mark:#ffd60a; --mark-ink:#111111; --bad:#c4001a; --ok:#0f8a4a;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15.5px/1.65 var(--sans);letter-spacing:-.005em;padding-inline:16px;-webkit-font-smoothing:antialiased}
+.page{max-width:1180px;margin:0 auto;padding-block:40px 90px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px}
+@media (max-width:900px){.page{grid-template-columns:1fr;gap:28px}}
+h1,h2,h3{margin:0;letter-spacing:-.025em;line-height:1.15;text-wrap:balance}
+h1{font-size:clamp(2.1rem,5vw,3rem);font-weight:800}
+h2{font-size:1.6rem;font-weight:700}
+h3{font-size:1.12rem;font-weight:650}
+p{margin:0}
+a{color:var(--blue)}
+code{font-family:var(--mono);font-size:.86em;background:var(--panel-2);padding:1px 6px;border-radius:6px;word-break:break-all}
+.eyebrow{display:block;font-size:.78rem;font-weight:600;color:var(--teal);margin-bottom:6px}
+
+/* rail */
+.rail{position:sticky;top:24px;align-self:start;display:flex;flex-direction:column;gap:4px;max-height:calc(100vh - 48px);overflow:auto}
+.rail b{font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:14px 0 4px}
+.rail a{color:var(--ink-2);text-decoration:none;font-size:.88rem;padding:4px 10px;border-radius:8px}
+.rail a:hover{background:var(--panel);color:var(--ink)}
+@media (max-width:900px){.rail{position:static;max-height:none;flex-direction:row;flex-wrap:wrap;gap:6px}.rail b{display:none}.rail a{background:var(--panel);border:1px solid var(--line)}}
+
+main{display:flex;flex-direction:column;gap:56px;min-width:0}
+.intro{display:flex;flex-direction:column;gap:16px}
+.lede{color:var(--ink-2);font-size:1.08rem;max-width:62ch}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.facts div{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.facts b{font-size:.95rem}
+.facts span{color:var(--ink-2);font-size:.88rem}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:520px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--panel-2)}
+tr:last-child td{border-bottom:0}
+
+section.part{display:flex;flex-direction:column;gap:30px;scroll-margin-top:20px}
+.part-head{display:flex;flex-direction:column;gap:8px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.part-head p{color:var(--ink-2);max-width:64ch}
+.step{display:flex;flex-direction:column;gap:12px;scroll-margin-top:20px}
+.step-head{display:flex;gap:12px;align-items:baseline}
+.step-head .no{font:600 .8rem var(--mono);color:var(--muted);min-width:38px}
+.step ol,.step ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;color:var(--ink-2);max-width:68ch}
+.step ol{list-style:none;padding-left:0}
+.step ol li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start}
+.n{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--mark);color:var(--mark-ink);font:800 .78rem var(--sans);margin-top:1px}
+figure{margin:0;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--panel);box-shadow:0 18px 50px rgba(0,0,0,.28)}
+figure img{display:block;width:100%;height:auto}
+figcaption{font-size:.84rem;color:var(--muted);padding:10px 14px;border-top:1px solid var(--line)}
+.tip{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:12px;padding:12px 16px;color:var(--ink-2);font-size:.92rem;max-width:72ch}
+.tip b{color:var(--ink)}
+.warn{border-left-color:var(--bad)}
+.flow{counter-reset:f;list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.flow li{counter-increment:f;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px 12px 56px;position:relative;color:var(--ink-2)}
+.flow li::before{content:counter(f);position:absolute;left:16px;top:12px;width:26px;height:26px;border-radius:50%;background:var(--panel-2);color:var(--ink);font:700 .8rem var(--mono);display:grid;place-items:center}
+.flow b{color:var(--ink)}
+dl.faq{margin:0;display:flex;flex-direction:column;gap:14px}
+dl.faq dt{font-weight:650}
+dl.faq dd{margin:4px 0 0;color:var(--ink-2)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+</style>
+
+<div class="page">
+<nav class="rail" aria-label="Contents">
+  <b>Start</b>
+  <a href="#intro">What VeriFin is</a>
+  <a href="#open">Opening the app</a>
+  <a href="#basics">Getting around</a>
+  <b>Guides</b>
+  <a href="#presenter">Presenter tools</a>
+  <a href="#lender">Lender</a>
+  <a href="#buyer">Buyer</a>
+  <a href="#business">Business</a>
+  <a href="#proof">Proof &amp; audit</a>
+  <b>Reference</b>
+  <a href="#demo">Demo script</a>
+  <a href="#faq">Troubleshooting</a>
+</nav>
+
+<main>
+  <section class="intro" id="intro">
+    <span class="eyebrow">User manual</span>
+    <h1>VeriFin User Manual</h1>
+    <p class="lede">VeriFin checks an invoice before a lender pays out against it: is it real, was it delivered, will the buyer pay, and has anyone financed it already. This manual walks through every screen. Yellow numbers in the text match the yellow markers on the screenshots.</p>
+    <div class="tbl"><table>
+      <tr><th>Workspace</th><th>Who it's for</th><th>What you do there</th></tr>
+      <tr><td><b>Shakti Bank</b>, <b>Kaveri Capital</b></td><td>Lenders</td><td>Review verified applications, see the evidence, pay out, monitor the portfolio and audit trail</td></tr>
+      <tr><td><b>Acme Precision Parts</b></td><td>A small business (supplier)</td><td>Upload an unpaid invoice, get an offer, track it to payout</td></tr>
+      <tr><td><b>Zenith Motors</b>, <b>Orbit Retail</b></td><td>Buyers who owe the money</td><td>Confirm or dispute invoices raised against them</td></tr>
+      <tr><td><b>Independent verifier</b></td><td>Auditors, anyone</td><td>Check a VeriFin record or document against the blockchain</td></tr>
+    </table></div>
+  </section>
+
+  <section class="part" id="open">
+    <div class="part-head"><span class="eyebrow">Before you start</span><h2>Opening the app</h2></div>
+    <div class="step">
+      <ol>
+        <li><span class="n">1</span><span>On the laptop where VeriFin is installed, double-click <code>start.bat</code> in the <code>verifin</code> folder. Two terminal windows open: the blockchain node and the app server. Keep both open.</span></li>
+        <li><span class="n">2</span><span>Your browser opens <code>http://localhost:8000</code>. If it doesn't, type that address into Chrome or Edge.</span></li>
+        <li><span class="n">3</span><span>For presenting, press <b>F11</b> for fullscreen.</span></li>
+      </ol>
+      <p class="tip"><b>First time on a new laptop?</b> Install Python 3.12 and Node.js, then run <code>setup.bat</code> once before <code>start.bat</code>.</p>
+    </div>
+  </section>
+
+  <section class="part" id="basics">
+    <div class="part-head"><span class="eyebrow">Basics</span><h2>Getting around</h2><p>Everything starts from the home page. You switch between the four kinds of users with the workspace button, the way you switch accounts in Slack.</p></div>
+    <div class="step" id="home">
+      <div class="step-head"><span class="no">1.1</span><h3>The home page</h3></div>
+      <ol>
+        <li><span class="n">1</span><span><b>Workspace button.</b> Shows who you're signed in as. Click it to switch.</span></li>
+        <li><span class="n">2</span><span><b>Get started</b> scrolls to the workspace cards.</span></li>
+        <li><span class="n">3</span><span>The faint <b>▶ button</b> opens the presenter tools (see section 2).</span></li>
+      </ol>
+      <figure><img src="img/01-home.jpg" alt="VeriFin home page with the workspace button, Get started button and presenter button highlighted" loading="lazy"><figcaption>Home page. Click the VeriFin logo any time to come back here.</figcaption></figure>
+    </div>
+    <div class="step" id="switch">
+      <div class="step-head"><span class="no">1.2</span><h3>Switching workspace</h3></div>
+      <p>Click the workspace button and pick an organisation. The navigation bar changes to match: lenders see Dashboard, Applications and Audit; a business sees My invoices and Get paid early; a buyer sees Confirmations.</p>
+      <figure><img src="img/02-workspace-switcher.jpg" alt="Workspace switcher menu listing lenders, businesses, buyers and the public verifier" loading="lazy"><figcaption>The workspace menu, grouped by role.</figcaption></figure>
+    </div>
+    <div class="step" id="cards">
+      <div class="step-head"><span class="no">1.3</span><h3>Or pick a workspace from the home page</h3></div>
+      <figure><img src="img/03-choose-workspace.jpg" alt="Four workspace cards: businesses, lenders, buyers, auditors" loading="lazy"><figcaption>Each card opens that workspace directly.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="part" id="presenter">
+    <div class="part-head"><span class="eyebrow">Section 2</span><h2>Presenter tools</h2><p>The presenter drawer fills the system with realistic activity. Each scenario submits real PDF documents (invoice, purchase order, delivery receipt) through the full pipeline, exactly as an upload would.</p></div>
+    <div class="step">
+      <div class="step-head"><span class="no">2.1</span><h3>Open the drawer</h3></div>
+      <ol>
+        <li><span class="n">1</span><span>Press <b>P</b> on the keyboard, or click ▶ in the bottom-right corner. Click <b>Submit to Shakti Bank</b> on scenario 01.</span></li>
+        <li><span class="n">2</span><span><b>Reset data</b> wipes everything and deploys a fresh contract. Do this before every presentation.</span></li>
+      </ol>
+      <figure><img src="img/04-presenter-drawer.jpg" alt="Presenter drawer listing scenarios with the first Submit button and Reset data highlighted" loading="lazy"><figcaption>Six scenarios: one genuine invoice, four fraud attempts, one risky buyer.</figcaption></figure>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="no">2.2</span><h3>Pay out the genuine invoice</h3></div>
+      <ol><li><span class="n">1</span><span>The result appears on the card: auto-approved, score 86. Click <b>Disburse &amp; register on-chain</b>. The bank pays out and the invoice is locked in the shared registry.</span></li></ol>
+      <figure><img src="img/05-scenario-result.jpg" alt="Scenario 01 result with the Disburse and register on-chain button highlighted" loading="lazy"><figcaption>Click "Open application #1" to see the full evidence in the lender workspace.</figcaption></figure>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="no">2.3</span><h3>Try to finance it twice</h3></div>
+      <ol><li><span class="n">1</span><span>Click scenario 02. The same invoice, re-issued with a different number format, goes to Kaveri Capital. It's <b>rejected</b>: the on-chain registry shows Shakti Bank already financed it.</span></li></ol>
+      <figure><img src="img/06-duplicate-blocked.jpg" alt="Scenario 02 rejected as duplicate financing" loading="lazy"><figcaption>Kaveri's own records were clean. Only the shared registry could catch this.</figcaption></figure>
+      <p class="tip"><b>Then run 03 to 06.</b> 03: inflated invoice with an edited PDF. 04: genuine but slow-paying buyer. 05: same delivery billed under a new number. 06: an invoice the buyer already paid.</p>
+    </div>
+  </section>
+
+  <section class="part" id="lender">
+    <div class="part-head"><span class="eyebrow">Section 3</span><h2>Lender guide</h2><p>Switch to <b>Shakti Bank</b>. Every application arrives already verified, scored and priced.</p></div>
+    <div class="step">
+      <div class="step-head"><span class="no">3.1</span><h3>Dashboard</h3></div>
+      <ol>
+        <li><span class="n">1</span><span><b>Portfolio numbers:</b> paid out, live exposure, approval rate, ₹ of fraud blocked, average decision time.</span></li>
+        <li><span class="n">2</span><span><b>Needs your attention:</b> applications waiting for a decision or a payout. Click one to open it.</span></li>
+        <li><span class="n">3</span><span><b>Blocked by VeriFin:</b> every rejected application with its reason and amount.</span></li>
+      </ol>
+      <figure><img src="img/07-lender-dashboard.jpg" alt="Lender dashboard with KPI strip, attention queue and blocked list highlighted" loading="lazy"><figcaption>Below: exposure by buyer and the ledger status.</figcaption></figure>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="no">3.2</span><h3>Reading an application</h3></div>
+      <ol>
+        <li><span class="n">1</span><span><b>Score ring:</b> 0 to 100 with a grade. Green is approved, amber needs review, red is blocked.</span></li>
+        <li><span class="n">2</span><span><b>Decision in plain English</b>, with the offer below it: advance %, rate, tenor, fees and net amount to the business.</span></li>
+        <li><span class="n">3</span><span><b>Evidence tabs:</b> Credit pack, Cross-checks, Duplicate shield, Forensics, Risk score, Extracted data, Audit trail, Privacy proof, Verification record.</span></li>
+      </ol>
+      <figure><img src="img/08-application.jpg" alt="Application detail with score ring, decision memo and evidence tabs highlighted" loading="lazy"><figcaption>Go to Applications in the top bar, then click any invoice in the list.</figcaption></figure>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="no">3.3</span><h3>Credit pack</h3></div>
+      <ol><li><span class="n">1</span><span>The lender's one-page summary: <b>what supports eligibility</b> on the left, <b>what still needs your review</b> on the right, each with the evidence and a suggested action.</span></li></ol>
+      <figure><img src="img/09-credit-pack.jpg" alt="Credit pack showing supporting facts and items needing review" loading="lazy"><figcaption>Below it: the buyer's recent payments and the seller's open receivables.</figcaption></figure>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="no">3.4</span><h3>Cross-checks: why an invoice failed</h3></div>
+      <ol><li><span class="n">1</span><span>Each check names the rule applied, a confidence level and the discrepancy in rupees, down to the line. Here the invoice bills 150 units against an order of 100, and the pad price was raised from ₹400 to ₹450.</span></li></ol>
+      <figure><img src="img/10-cross-checks.jpg" alt="Purchase order match check failing with a line-by-line table" loading="lazy"><figcaption>Application INV-2026-1002 (scenario 03).</figcaption></figure>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="no">3.5</span><h3>Duplicate shield</h3></div>
+      <ol><li><span class="n">1</span><span>Four layers: same file, same invoice fingerprint, look-alike invoices, and the shared on-chain registry. Layer 4 is the one that sees across lenders.</span></li></ol>
+      <figure><img src="img/11-duplicate-shield.jpg" alt="Duplicate shield with the on-chain registry layer failing" loading="lazy"><figcaption>Kaveri Capital's view of the double-pledged invoice (scenario 02).</figcaption></figure>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="no">3.6</span><h3>Payment reconciliation</h3></div>
+      <ol><li><span class="n">1</span><span>Compares what was charged (invoice), what was paid (bank statement) and what the seller claims is outstanding (statement of account). Here the buyer already paid, and the statement leaves the payment out.</span></li></ol>
+      <figure><img src="img/12-reconciliation.jpg" alt="Payment and statement reconciliation check showing an omitted payment" loading="lazy"><figcaption>Application INV-2026-1004 (scenario 06).</figcaption></figure>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="no">3.7</span><h3>Manual review and buyer confirmation</h3></div>
+      <ol>
+        <li><span class="n">1</span><span><b>Request buyer confirmation</b> asks the buyer to acknowledge the invoice. It lands in their Confirmations inbox.</span></li>
+        <li><span class="n">2</span><span><b>Approve</b> or <b>Reject</b> when you've reviewed it. Approved invoices get a <b>Disburse</b> button.</span></li>
+      </ol>
+      <figure><img src="img/13-manual-review.jpg" alt="Application in manual review with Request buyer confirmation and Approve highlighted" loading="lazy"><figcaption>INV-2026-1003 to Orbit Retail, who pays about 44 days late on average.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="part" id="buyer">
+    <div class="part-head"><span class="eyebrow">Section 4</span><h2>Buyer guide</h2><p>Switch to <b>Orbit Retail</b> (or Zenith Motors). Buyers see every invoice their suppliers are financing.</p></div>
+    <div class="step">
+      <div class="step-head"><span class="no">4.1</span><h3>Confirm or dispute</h3></div>
+      <ol>
+        <li><span class="n">1</span><span><b>Confirm</b> signs "we owe this" on the blockchain.</span></li>
+        <li><span class="n">2</span><span>The tag shows which lender asked. <b>Dispute</b> opens a short form (goods not received, wrong price, already paid, duplicate) and puts financing on hold.</span></li>
+      </ol>
+      <figure><img src="img/14-buyer-inbox.jpg" alt="Buyer confirmations inbox with Confirm button and Requested by Shakti Bank tag" loading="lazy"><figcaption>Orbit Retail's inbox.</figcaption></figure>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="no">4.2</span><h3>What confirmation changes</h3></div>
+      <ol>
+        <li><span class="n">1</span><span>The supplier's risk score improves (here 53 → 65, grade C → B), which raises the advance it's offered.</span></li>
+        <li><span class="n">2</span><span>The invoice is marked <b>Confirmed on-chain</b>.</span></li>
+      </ol>
+      <figure><img src="img/15-buyer-confirmed.jpg" alt="Invoice confirmed on-chain with notification showing the score improvement" loading="lazy"><figcaption>Back in Shakti Bank, the application now shows "Buyer-confirmed".</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="part" id="business">
+    <div class="part-head"><span class="eyebrow">Section 5</span><h2>Business guide</h2><p>Switch to <b>Acme Precision Parts</b>.</p></div>
+    <div class="step">
+      <div class="step-head"><span class="no">5.1</span><h3>Track your invoices</h3></div>
+      <ol>
+        <li><span class="n">1</span><span>Each invoice shows where it is: Submitted → Verified → Offer → Funded → Repaid, with a note on what happens next.</span></li>
+        <li><span class="n">2</span><span>Declined requests show the reason.</span></li>
+      </ol>
+      <figure><img src="img/16-business-invoices.jpg" alt="Business invoice tracker with stage timeline and a declined request" loading="lazy"><figcaption>"My invoices". The numbers at the top show money received early and open offers.</figcaption></figure>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="no">5.2</span><h3>Get paid early</h3></div>
+      <ol>
+        <li><span class="n">1</span><span>Choose the lender and upload the tax invoice. Add the purchase order, delivery note, bank statement and statement of account for a stronger offer.</span></li>
+        <li><span class="n">2</span><span>Click <b>Submit for financing</b>. The decision appears in seconds.</span></li>
+      </ol>
+      <figure><img src="img/17-get-paid-early.jpg" alt="Upload form with invoice field and submit button highlighted" loading="lazy"><figcaption>Example PDFs are under "Example documents" on the right of this page.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="part" id="proof">
+    <div class="part-head"><span class="eyebrow">Section 6</span><h2>Proof &amp; audit</h2><p>Every decision can be proven to someone who doesn't trust VeriFin.</p></div>
+    <div class="step">
+      <div class="step-head"><span class="no">6.1</span><h3>Issue a verification record</h3></div>
+      <p>As Shakti Bank, open the funded invoice INV-2026-1001, go to the <b>Verification record</b> tab and click <b>Issue signed record</b>. It lists the documents (as fingerprints), every rule applied and its result, and the decision. It's signed and anchored on-chain. Click <b>Download record</b> to save it.</p>
+      <ol><li><span class="n">1</span><span><b>Verify this record now</b> checks the signature and the on-chain anchor. <b>Forge it</b> changes the decision and shows the check failing.</span></li></ol>
+      <figure><img src="img/18-verification-record.jpg" alt="Verification record verified with all checks passing" loading="lazy"><figcaption>Anyone can also check it offline with <code>python tools/verify_record.py record.json invoice.pdf</code>.</figcaption></figure>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="no">6.2</span><h3>Verify as an outsider</h3></div>
+      <ol>
+        <li><span class="n">1</span><span>Switch to <b>Independent verifier</b> and upload the record file (optionally with the documents you hold).</span></li>
+        <li><span class="n">2</span><span>The result: signature, anchor and whether the documents have changed since verification.</span></li>
+      </ol>
+      <figure><img src="img/19-public-verifier.jpg" alt="Public verifier showing a verified record" loading="lazy"><figcaption>"Verify a document" on the same page checks any single file.</figcaption></figure>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="no">6.3</span><h3>Share only what's needed</h3></div>
+      <ol>
+        <li><span class="n">1</span><span>In the <b>Privacy proof</b> tab, tick the fields to reveal (for example total, due date and buyer) and click <b>Generate proof card</b>.</span></li>
+        <li><span class="n">2</span><span><b>Verify as the recipient</b> proves those fields belong to the original invoice without revealing anything else.</span></li>
+      </ol>
+      <figure><img src="img/20-privacy-proof.jpg" alt="Privacy proof with selected fields and verification result" loading="lazy"><figcaption>"Try forging the amount" shows a changed value failing.</figcaption></figure>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="no">6.4</span><h3>Audit trail</h3></div>
+      <ol>
+        <li><span class="n">1</span><span>As a lender, open <b>Audit</b> and click <b>Verify everything</b>.</span></li>
+        <li><span class="n">2</span><span>It recomputes every event, link, on-chain anchor and stored file.</span></li>
+      </ol>
+      <figure><img src="img/21-audit.jpg" alt="Audit page showing all records intact" loading="lazy"><figcaption>Click any event in the log to see its on-chain proof.</figcaption></figure>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="no">6.5</span><h3>Catching an insider</h3></div>
+      <ol><li><span class="n">1</span><span>In the presenter drawer, click <b>Tamper a stored invoice</b> and <b>Rewrite a decision</b>, then <b>Verify integrity</b>. It pinpoints the edited record, the on-chain mismatch and the altered file.</span></li></ol>
+      <figure><img src="img/22-tamper-detected.jpg" alt="Tampering detected with the altered record and file listed" loading="lazy"><figcaption>Click <b>Restore</b> afterwards to undo the tampering.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="part" id="demo">
+    <div class="part-head"><span class="eyebrow">Reference</span><h2>Demo script</h2><p>About five minutes. Reset data first.</p></div>
+    <ol class="flow">
+      <li><b>Home page.</b> One line on the problem, then "Choose your workspace".</li>
+      <li><b>Press P → 01 → Disburse.</b> "Verified, scored and priced in under a second."</li>
+      <li><b>02.</b> "A second lender, clean books, and it's still blocked."</li>
+      <li><b>03, 05, 06</b>, then the Shakti Bank dashboard: the blocked list fills with reasons and amounts.</li>
+      <li><b>04 → Request buyer confirmation → Orbit Retail → Confirm.</b> Score 53 → 65.</li>
+      <li><b>Acme → My invoices.</b> The business's view of the same story.</li>
+      <li><b>Verification record → Independent verifier.</b> "Anyone can check this without trusting us."</li>
+      <li><b>Tamper + Verify integrity.</b> "Even we can't rewrite history."</li>
+    </ol>
+  </section>
+
+  <section class="part" id="faq">
+    <div class="part-head"><span class="eyebrow">Reference</span><h2>Troubleshooting</h2></div>
+    <dl class="faq">
+      <dt>The page doesn't load at localhost:8000</dt><dd>The app isn't running. Double-click <code>start.bat</code> and keep both terminal windows open.</dd>
+      <dt>The status chip says "Ledger offline"</dt><dd>The blockchain window was closed. Close both windows and run <code>start.bat</code> again. The app clears old data automatically when it detects a fresh chain.</dd>
+      <dt>Scenario 02 was approved instead of blocked</dt><dd>Invoice #1 hadn't been paid out yet. Current versions fund it automatically first; if you see this, click <b>Reset data</b> and run 01 → Disburse → 02.</dd>
+      <dt>Fonts look different</dt><dd>The typeface loads from Google Fonts. Offline, the app falls back to the system font and still works.</dd>
+      <dt>I want to start over</dt><dd>Press P, then <b>Reset data</b>.</dd>
+    </dl>
+  </section>
+</main>
+</div>

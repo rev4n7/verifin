@@ -1,0 +1,10 @@
+.venv/
+chain/node_modules/
+chain/artifacts/
+chain/cache/
+data/
+samples/
+__pycache__/
+backend/.claude/
+*.bak
+*.pyc

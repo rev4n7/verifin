@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VeriFin — Verified invoice financing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/static/style.css?v=22">
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="left">
+      <a class="brand" href="#" onclick="show('home');return false" aria-label="VeriFin home">
+        <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7"/></svg></span>
+        <b>VeriFin</b>
+      </a>
+      <div class="ws">
+        <button class="ws-btn" id="ws-btn" aria-haspopup="true" aria-expanded="false"></button>
+        <div class="ws-menu" id="ws-menu" hidden></div>
+      </div>
+    </div>
+    <nav id="nav" class="segmented" aria-label="Sections"></nav>
+    <div class="chips" id="chips"></div>
+  </div>
+</header>
+
+<main>
+  <!-- HOME -->
+  <section id="view-home" class="view">
+    <div class="landing">
+      <div class="landing-copy">
+        <span class="eyebrow">Invoice financing, verified</span>
+        <h1>Verify the invoice.<br><span class="grad">Prove every decision.</span></h1>
+        <p class="lede">VeriFin checks an invoice against the purchase order, delivery, bank statement and every other lender in seconds, then turns the decision into proof anyone can verify on-chain.</p>
+        <div class="row cta">
+          <button class="btn primary lg" onclick="document.getElementById('workspaces').scrollIntoView({behavior:'smooth'})">Get started</button>
+          <button class="btn secondary lg" onclick="setPersona('public')">Verify a record</button>
+        </div>
+      </div>
+      <div class="landing-visual" aria-hidden="true">
+        <div class="ghost-card"><span class="g-dot"></span><b>INV/2026/1001</b><span class="g-tag">Duplicate blocked</span></div>
+        <div class="doc-card">
+          <div class="doc-head">
+            <span class="doc-logo">A</span>
+            <div><b>INV-2026-1001</b><small>Acme Precision Parts → Zenith Motors</small></div>
+            <span class="doc-amt">₹5,90,000</span>
+          </div>
+          <ul class="doc-checks">
+            <li style="--i:0"><span class="tick"></span>Data extracted<em>100%</em></li>
+            <li style="--i:1"><span class="tick"></span>No edits after creation<em>clean</em></li>
+            <li style="--i:2"><span class="tick"></span>Matches purchase order<em>2/2 lines</em></li>
+            <li style="--i:3"><span class="tick"></span>Delivery confirmed<em>GRN-4410</em></li>
+            <li style="--i:4"><span class="tick"></span>Unpaid · statement reconciles<em>₹0 gap</em></li>
+            <li style="--i:5"><span class="tick"></span>Not financed elsewhere<em>on-chain</em></li>
+          </ul>
+          <div class="doc-foot">
+            <div class="ring" style="width:76px;height:76px"><svg viewBox="0 0 120 120"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#30d158"/><stop offset="1" stop-color="#00c7be"/></linearGradient></defs><circle cx="60" cy="60" r="50" class="ring-track"/><circle cx="60" cy="60" r="50" class="ring-prog" stroke="url(#hg)" style="--c:314;stroke-dasharray:314;stroke-dashoffset:44" transform="rotate(-90 60 60)"/></svg><div class="ring-label"><b>86</b><span>A</span></div></div>
+            <div><b>Approved · 90% advance</b><small>₹5,21,191 to the SME today</small></div>
+          </div>
+          <div class="anchor-chip"><span class="pulse"></span>Anchored on-chain · Merkle root 0x385f…7605</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-head" id="workspaces"><div><span class="eyebrow">One network, four sides</span><h2>Choose your workspace.</h2></div></div>
+    <div class="spaces">
+      <button class="space" onclick="setPersona('acme')"><span class="sp-ic" style="--c:#3fe0d0"><svg viewBox="0 0 24 24"><path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6h6v6"/></svg></span><b>For businesses</b><span>Upload an invoice, get an offer in seconds, and get paid today instead of in 60 days.</span><em>Open as Acme Precision Parts →</em></button>
+      <button class="space" onclick="setPersona('lender_a')"><span class="sp-ic" style="--c:#4aa8ff"><svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg></span><b>For lenders</b><span>Every application arrives verified, scored and priced, with the evidence behind each decision.</span><em>Open as Shakti Bank →</em></button>
+      <button class="space" onclick="setPersona('zenith')"><span class="sp-ic" style="--c:#ffb547"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12.5l2.5 2.5 5-5.5"/></svg></span><b>For buyers</b><span>Confirm or dispute invoices raised against you in one click. Confirmed invoices get suppliers better rates.</span><em>Open as Zenith Motors →</em></button>
+      <button class="space" onclick="setPersona('public')"><span class="sp-ic" style="--c:#9a9bff"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><b>For auditors</b><span>Check any VeriFin record or document against the blockchain. No account, no trust required.</span><em>Verify a record →</em></button>
+    </div>
+
+    <div class="pipeline">
+      <div class="section-head"><div><span class="eyebrow">How it works</span><h2>Seven checks. One provable decision.</h2></div></div>
+      <ol class="steps">
+        <li><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg><b>Extract</b><span>PDF or scan → structured data</span></li>
+        <li><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg><b>Forensics</b><span>Was the PDF edited?</span></li>
+        <li><svg viewBox="0 0 24 24"><path d="M4 6h10M4 12h10M4 18h7"/><path d="M15 16l2 2 4-4"/></svg><b>Cross-check</b><span>Invoice ↔ PO ↔ delivery</span></li>
+        <li><svg viewBox="0 0 24 24"><path d="M4 8h14l-3-3"/><path d="M20 16H6l3 3"/></svg><b>Reconcile</b><span>Charged vs paid vs claimed</span></li>
+        <li><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg><b>Duplicate shield</b><span>Across every lender</span></li>
+        <li><svg viewBox="0 0 24 24"><path d="M4 16a8 8 0 0116 0"/><path d="M12 16l4-5"/></svg><b>Risk &amp; price</b><span>Explainable score → offer</span></li>
+        <li><svg viewBox="0 0 24 24"><rect x="2.5" y="9" width="10" height="6" rx="3"/><rect x="11.5" y="9" width="10" height="6" rx="3"/></svg><b>Anchor</b><span>Tamper-evident on-chain</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- LENDER DASHBOARD -->
+  <section id="view-dash" class="view" hidden>
+    <div class="section-head"><div><span class="eyebrow" id="dash-eyebrow">Credit desk</span><h2 id="dash-title">Portfolio</h2></div><button class="btn secondary" onclick="show('desk')">All applications</button></div>
+    <div class="stats" id="dash-kpis"></div>
+    <div class="dash-grid">
+      <div class="card"><h3>Needs your attention</h3><div id="dash-attention"></div></div>
+      <div class="card"><h3>Blocked by VeriFin</h3><div id="dash-blocked"></div></div>
+      <div class="card"><h3>Exposure by buyer</h3><div id="dash-exposure"></div></div>
+      <div class="card"><h3>Consortium ledger</h3><div id="dash-network"></div></div>
+    </div>
+  </section>
+
+  <!-- LENDER APPLICATIONS -->
+  <section id="view-desk" class="view" hidden>
+    <div class="desk">
+      <aside class="list">
+        <div class="list-head"><h3>Applications</h3><span class="muted" id="list-count"></span></div>
+        <div id="app-list"></div>
+      </aside>
+      <div class="detail" id="detail"><div class="empty"><b>No application selected</b>Pick one from the list.</div></div>
+    </div>
+  </section>
+
+  <!-- BUSINESS: MY INVOICES -->
+  <section id="view-biz" class="view" hidden>
+    <div class="section-head"><div><span class="eyebrow" id="biz-eyebrow">Acme Precision Parts</span><h2>Your invoices</h2><p>Track every financing request from submission to payout.</p></div><button class="btn primary" onclick="show('sme')">Get paid early</button></div>
+    <div class="stats" id="biz-kpis"></div>
+    <div id="biz-list" class="biz-list"></div>
+  </section>
+
+  <!-- BUSINESS: NEW REQUEST -->
+  <section id="view-sme" class="view" hidden>
+    <div class="section-head"><div><span class="eyebrow">New financing request</span><h2>Get paid today for invoices due in 60 days.</h2><p>Upload the invoice with the buyer's purchase order and delivery receipt. You'll get a decision in seconds.</p></div></div>
+    <div class="sme">
+      <form id="sme-form" class="card form">
+        <label for="sme-lender">Apply to</label>
+        <select id="sme-lender" name="lender_id"></select>
+        <label for="f-invoice">Tax invoice <em>required</em></label><input id="f-invoice" type="file" name="invoice" accept=".pdf,.png,.jpg,.jpeg" required>
+        <label for="f-po">Purchase order</label><input id="f-po" type="file" name="po" accept=".pdf,.png,.jpg,.jpeg">
+        <label for="f-grn">Goods receipt / delivery note</label><input id="f-grn" type="file" name="grn" accept=".pdf,.png,.jpg,.jpeg">
+        <label for="f-bank">Bank statement <em>shared via Account Aggregator</em></label><input id="f-bank" type="file" name="bank" accept=".pdf">
+        <label for="f-soa">Statement of account with this buyer</label><input id="f-soa" type="file" name="soa" accept=".pdf">
+        <button class="btn primary lg" type="submit" id="sme-submit">Submit for financing</button>
+        <div id="sme-msg"></div>
+      </form>
+      <div class="card">
+        <h3>What happens next</h3>
+        <ol class="next">
+          <li><b>Seconds:</b> we read your documents, cross-check them, and check no other lender has financed this invoice.</li>
+          <li><b>Offer:</b> you see the advance, the rate and exactly why.</li>
+          <li><b>Payout:</b> the lender disburses, and the invoice is registered so it can't be financed twice.</li>
+        </ol>
+        <h3 style="margin-top:14px">Your documents stay private</h3>
+        <ul class="plain">
+          <li>Files are encrypted at rest.</li>
+          <li>Only hashes go on-chain. Nobody can read invoice details from them.</li>
+        </ul>
+        <details class="samples"><summary>Example documents</summary><div id="sample-links"></div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUYER: CONFIRMATIONS -->
+  <section id="view-buyer" class="view" hidden>
+    <div class="section-head"><div><span class="eyebrow" id="buyer-eyebrow">Accounts payable</span><h2>Invoices raised against you</h2><p>Confirm the invoices you owe, or dispute anything that's wrong. Your confirmation is signed on-chain, and it helps your suppliers get paid sooner at better rates.</p></div></div>
+    <div id="buyer-list" class="buyer-list"></div>
+  </section>
+
+  <!-- PUBLIC VERIFY -->
+  <section id="view-verify" class="view" hidden>
+    <div class="section-head"><div><span class="eyebrow">Public verification</span><h2>Don't trust. Verify.</h2><p>Check any VeriFin record or document yourself. Signatures and hashes are checked against the consortium ledger.</p></div></div>
+    <div class="grid2">
+      <div class="card">
+        <h3>Verify a VeriFin record</h3>
+        <p class="muted">A signed record lists the documents, every rule applied, discrepancies found and the decision.</p>
+        <label for="pv-record">Record (.json)</label><input type="file" id="pv-record" accept=".json">
+        <label for="pv-docs">Documents you hold <em class="muted">optional, to check they haven't changed</em></label><input type="file" id="pv-docs" multiple>
+        <div class="row"><button class="btn primary" id="pv-go">Verify record</button></div>
+        <div id="pv-out"></div>
+        <p class="muted">Prefer the command line? <span class="mono">python tools/verify_record.py record.json invoice.pdf</span> reads the ledger directly, without VeriFin's servers.</p>
+      </div>
+      <div class="card">
+        <h3>Verify a document</h3>
+        <p class="muted">Drop any file. If it was ever submitted, you get a Merkle proof that its hash sits in a batch anchored on-chain. Change one byte and it won't match.</p>
+        <input type="file" id="doc-check" aria-label="Document to verify">
+        <div id="doc-check-out"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUDIT -->
+  <section id="view-audit" class="view" hidden>
+    <div class="section-head"><div><span class="eyebrow">Hybrid audit</span><h2>Off-chain records. On-chain proof.</h2><p>Every event is hash-chained to the one before it, and batches are anchored in the smart contract.</p></div><button class="btn primary" id="verify-all">Verify everything</button></div>
+    <div id="verify-out"></div>
+    <div class="grid2">
+      <div class="card"><h3>On-chain anchors</h3><div id="anchors" class="scroll"></div></div>
+      <div class="card"><h3>Hash-chained event log</h3><p class="muted">Click an event for its on-chain proof.</p><div id="events" class="scroll"></div></div>
+    </div>
+  </section>
+</main>
+
+<!-- Presenter tools: kept off the product surface -->
+<button class="fab" id="fab" title="Presenter tools (press P)" aria-label="Open presenter tools"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+<aside class="drawer" id="drawer" hidden aria-label="Presenter tools">
+  <div class="drawer-head">
+    <div><span class="eyebrow">Presenter</span><h3>Live scenarios</h3></div>
+    <div class="row"><button class="btn secondary" id="reset">Reset data</button><button class="x" id="drawer-x" aria-label="Close">×</button></div>
+  </div>
+  <p class="muted small">Submits real documents through the full pipeline. Results open in the right workspace.</p>
+  <div class="lab" id="lab"></div>
+  <h3 style="margin-top:8px">Insider attacks</h3>
+  <div class="row">
+    <button class="btn secondary" data-rt="tamper-document">Tamper a stored invoice</button>
+    <button class="btn secondary" data-rt="tamper-event">Rewrite a decision</button>
+    <button class="btn primary" data-rt="verify">Verify integrity</button>
+    <button class="btn secondary" data-rt="restore">Restore</button>
+  </div>
+  <div id="rt-result"></div>
+</aside>
+
+<div id="modal" class="modal" hidden><div class="modal-box"><button class="x" id="modal-x" aria-label="Close">×</button><div id="modal-body"></div></div></div>
+<div id="toast" class="toast" hidden></div>
+<script src="/static/app.js?v=22"></script>
+</body>
+</html>
