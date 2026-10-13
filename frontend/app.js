@@ -1,4 +1,4 @@
-/* VeriFin front end — plain JS, no build step */
+/* Verbil front end — plain JS, no build step */
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -364,7 +364,7 @@ async function renderPack(d, el) {
 
 function renderRecord(d, el) {
   el.innerHTML = `<div style="margin-top:12px;display:flex;flex-direction:column;gap:12px">
-    <p class="muted">A portable record any authorised party (buyer, auditor, another lender) can check <b>without trusting or even contacting VeriFin</b>. It lists the documents submitted (as hashes), every rule applied and its result, the discrepancies found and the decision. It's signed with VeriFin's Ed25519 key and anchored on-chain. Shaped like a W3C Verifiable Credential so other systems can ingest it.</p>
+    <p class="muted">A portable record any authorised party (buyer, auditor, another lender) can check <b>without trusting or even contacting Verbil</b>. It lists the documents submitted (as hashes), every rule applied and its result, the discrepancies found and the decision. It's signed with Verbil's Ed25519 key and anchored on-chain. Shaped like a W3C Verifiable Credential so other systems can ingest it.</p>
     <div class="row"><button class="btn primary" id="issue-rec">Issue signed record</button></div>
     <div id="rec-out"></div>
     <div class="card" style="background:var(--sunk)"><h3>Check a record (as the recipient)</h3>
@@ -378,7 +378,7 @@ function renderRecord(d, el) {
     const cs = rec.credentialSubject;
     $("#rec-out").innerHTML = `<div class="ok-big good"><b>✓ Record issued</b><span>${esc(rec.id)} · signed · anchored in block ${rec.anchorProof.block}</span></div>
       <div class="tbl"><table><tr><th>Rule</th><th>Check</th><th>Result</th><th>Confidence</th><th>Finding</th></tr>${cs.rulesApplied.map((r) => `<tr class="${r.result === "fail" ? "bad" : ""}"><td class="mono">${r.rule} v${r.version}</td><td>${esc(r.check)}</td><td>${pill(r.result, r.result.toUpperCase())}</td><td>${Math.round(r.confidence * 100)}%</td><td>${esc(r.finding)}</td></tr>`).join("")}</table></div>
-      <div class="row"><a class="btn" href="${url}" download="verifin-record-${d.id}.json">Download record (.json)</a><button class="btn ghost" id="rec-self">Verify this record now</button><button class="btn ghost" id="rec-forge">Forge it (change decision) and verify</button></div>
+      <div class="row"><a class="btn" href="${url}" download="verbil-record-${d.id}.json">Download record (.json)</a><button class="btn ghost" id="rec-self">Verify this record now</button><button class="btn ghost" id="rec-forge">Forge it (change decision) and verify</button></div>
       <div id="rec-inline"></div>
       <pre class="pkg">${esc(JSON.stringify(rec, null, 1))}</pre>`;
     $("#rec-self").onclick = () => verifyRecord(rec, [], false, $("#rec-inline"));
@@ -564,7 +564,7 @@ async function loadBuyer() {
       <div class="br-amt">${inr(r.amount)}</div>
       <div class="br-act">${r.confirmed ? `<span class="tag ok">✓ Confirmed on-chain</span>` : r.status === "DISPUTED" ? `<span class="tag bad">Disputed</span>`
         : `<button class="btn primary" data-confirm="${r.id}">Confirm</button><button class="btn danger" data-dispute="${r.id}">Dispute</button>`}</div>
-    </article>`).join("") : `<div class="empty"><b>Nothing to confirm</b>Invoices your suppliers finance through VeriFin appear here.</div>`;
+    </article>`).join("") : `<div class="empty"><b>Nothing to confirm</b>Invoices your suppliers finance through Verbil appear here.</div>`;
   $$("[data-confirm]").forEach((b) => (b.onclick = () => busy(b, async () => {
     const res = await post(`/api/applications/${b.dataset.confirm}/buyer-confirm`);
     toast(`Confirmed and signed on-chain. ${res.seller_name}'s risk score improved ${res.rescore.from} → ${res.rescore.to}.`);
@@ -589,7 +589,7 @@ $("#pv-go").onclick = async () => {
   const f = $("#pv-record").files[0];
   if (!f) return toast("Choose a record file first");
   let rec;
-  try { rec = JSON.parse(await f.text()); } catch (e) { return toast("That file isn't a valid VeriFin record"); }
+  try { rec = JSON.parse(await f.text()); } catch (e) { return toast("That file isn't a valid Verbil record"); }
   verifyRecord(rec, [...$("#pv-docs").files], false, $("#pv-out"));
 };
 

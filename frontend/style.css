@@ -1,4 +1,4 @@
-/* VeriFin — light, airy, Apple-inspired: frosted chrome, large tight type, soft depth, system colours */
+/* Verbil — light, airy, Apple-inspired: frosted chrome, large tight type, soft depth, system colours */
 :root{
   --bg:#f5f5f7; --surface:#ffffff; --sunk:#f5f5f7; --ink:#1d1d1f; --ink-2:#424245; --muted:#6e6e73; --line:rgba(0,0,0,.08);
   --track:rgba(0,0,0,.06);
@@ -493,3 +493,8 @@ details.samples summary{cursor:pointer;font-size:.85rem}
 .drawer .expect{font-size:.8rem!important;padding:8px 10px}
 
 .drawer .x{position:static;flex:none}
+
+/* brand wordmark */
+.wordmark{height:44px;margin:-6px 0;width:auto;display:block;filter:drop-shadow(0 0 10px rgba(167,139,250,.35))}
+@media (max-width:860px){.wordmark{height:34px}}
+.hero-mark{display:block;height:clamp(64px,8vw,104px);width:auto;margin:0 0 6px -14px;filter:drop-shadow(0 0 24px rgba(167,139,250,.35))}

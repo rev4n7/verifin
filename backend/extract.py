@@ -1,5 +1,5 @@
 """Document -> structured data. Offline layout parser first; Claude (vision/PDF) when a key is configured
-and the parser isn't confident, or when VERIFIN_EXTRACTOR=claude."""
+and the parser isn't confident, or when VERBIL_EXTRACTOR=claude."""
 import base64
 import io
 import json
@@ -170,7 +170,7 @@ def extract_with_claude(data: bytes, media_type: str) -> dict:
 def extract(data: bytes, filename: str, expected_type: str | None = None) -> dict:
     is_pdf = data[:4] == b"%PDF"
     media = "application/pdf" if is_pdf else ("image/png" if filename.lower().endswith(".png") else "image/jpeg")
-    force_claude = os.environ.get("VERIFIN_EXTRACTOR") == "claude"
+    force_claude = os.environ.get("VERBIL_EXTRACTOR") == "claude"
     parsed = None
     if is_pdf and not force_claude:
         parsed = parse_text(pdf_text(data), expected_type)

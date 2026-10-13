@@ -1,5 +1,5 @@
 @echo off
-REM VeriFin one-time setup: Python packages, Hardhat, contract compile
+REM Verbil one-time setup: Python packages, Hardhat, contract compile
 cd /d %~dp0
 set HARDHAT_DISABLE_TELEMETRY_PROMPT=true
 if not exist ".venv\Scripts\python.exe" (
@@ -12,7 +12,7 @@ call npm install || (popd & goto :err)
 call npx hardhat compile || (popd & goto :err)
 popd
 echo.
-echo Setup complete. Run start.bat to launch VeriFin.
+echo Setup complete. Run start.bat to launch Verbil.
 exit /b 0
 :err
 echo.

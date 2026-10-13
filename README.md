@@ -1,8 +1,10 @@
-# VeriFin: invoice financing with a hybrid audit architecture
+<p align="center"><img src="docs/brand/verbil-logo-transparent.png" alt="Verbil" width="460"></p>
+
+# Verbil: invoice financing with a hybrid audit architecture
 
 **Verify the invoice. Establish the trust. Accelerate the financing.**
 
-VeriFin checks an invoice in seconds before a lender advances cash against it. It reads the invoice, purchase order and delivery receipt; checks the PDF for signs of editing; cross-checks invoice, PO and delivery; reconciles what was charged, paid and claimed outstanding; screens for duplicates across lenders through an on-chain registry; scores buyer risk with an explanation for every point; prices the advance; and records each step in a tamper-evident audit log anchored on a blockchain.
+Verbil checks an invoice in seconds before a lender advances cash against it. It reads the invoice, purchase order and delivery receipt; checks the PDF for signs of editing; cross-checks invoice, PO and delivery; reconciles what was charged, paid and claimed outstanding; screens for duplicates across lenders through an on-chain registry; scores buyer risk with an explanation for every point; prices the advance; and records each step in a tamper-evident audit log anchored on a blockchain.
 
 **User manual with screenshots:** [`docs/manual/index.html`](docs/manual/index.html) (open it in a browser).
 

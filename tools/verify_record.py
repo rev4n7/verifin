@@ -1,4 +1,4 @@
-"""Independent verifier for a VeriFin Verification Record. Does NOT call the VeriFin server.
+"""Independent verifier for a Verbil Verification Record. Does NOT call the Verbil server.
 
 Checks:
   1. Ed25519 signature over the record (issuer public key, pinned with --issuer-key)

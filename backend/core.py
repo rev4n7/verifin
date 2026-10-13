@@ -17,10 +17,10 @@ SAMPLES = BASE / "samples"
 DATA.mkdir(exist_ok=True)
 STORE.mkdir(exist_ok=True)
 
-DB_PATH = DATA / "verifin.db"
+DB_PATH = DATA / "verbil.db"
 # Shared secret held by the lender consortium. Fingerprints on-chain are HMACs under this key,
 # so nobody outside the network can brute-force invoice details from them.
-CONSORTIUM_KEY = os.environ.get("VERIFIN_CONSORTIUM_KEY", "verifin-lender-consortium-demo-key").encode()
+CONSORTIUM_KEY = os.environ.get("VERBIL_CONSORTIUM_KEY", "verbil-lender-consortium-demo-key").encode()
 
 LENDERS = {
     "lender_a": {"id": "lender_a", "name": "Shakti Bank", "short": "Lender A", "account": 1},

@@ -1,8 +1,8 @@
-<title>VeriFin Build Log</title>
+<title>Verbil Build Log</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: one reading column; a "start here" brief, then the conversation as a chat thread grouped into chapters. Dark-first, VeriFin glass blue. */
+/* Layout: one reading column; a "start here" brief, then the conversation as a chat thread grouped into chapters. Dark-first, Verbil glass blue. */
 :root{
   color-scheme:dark;
   --bg:#06102a; --panel:#0e1b3d; --panel-2:#13244d; --ink:#eef3ff; --ink-2:#c3d0ea; --muted:#8ea1c4; --line:rgba(255,255,255,.10);
@@ -76,8 +76,8 @@ footer{color:var(--muted);font-size:.84rem;border-top:1px solid var(--line);padd
 <div class="wrap">
 <header>
   <span class="eyebrow">Hackathon build log · invoice financing</span>
-  <h1>VeriFin Build Log</h1>
-  <p class="lede">The full working conversation that produced VeriFin: the problem, every decision, the features we added after feedback, and how to run and pitch it. Read "Start here" first if you're short on time.</p>
+  <h1>Verbil Build Log</h1>
+  <p class="lede">The full working conversation that produced Verbil: the problem, every decision, the features we added after feedback, and how to run and pitch it. Read "Start here" first if you're short on time.</p>
   <p class="meta">13 October 2026 · built with Claude Code · replies condensed, decisions and numbers kept exactly</p>
 </header>
 
@@ -88,7 +88,7 @@ footer{color:var(--muted);font-size:.84rem;border-top:1px solid var(--line);padd
   </div>
   <div class="brief-grid">
     <div>
-      <h3>What VeriFin is</h3>
+      <h3>What Verbil is</h3>
       <p class="note">An invoice-financing platform. It verifies an invoice in seconds against the purchase order, delivery receipt, bank statement and every other lender, prices the advance from the buyer's payment history, and records each step in a tamper-evident audit trail anchored on a blockchain.</p>
       <h3>Workspaces in the app</h3>
       <ul>
@@ -118,12 +118,12 @@ footer{color:var(--muted);font-size:.84rem;border-top:1px solid var(--line);padd
   </div>
   <div>
     <h3 style="margin-bottom:8px">Opening line for the judges</h3>
-    <p class="quote">"Before funding an invoice, a lender needs four answers: is it real, was it delivered, will the buyer pay, and is it already financed elsewhere. Today those answers come from separate tools owned by separate parties, and nobody else can check them. VeriFin answers all four in seconds, explains each answer with evidence down to the line and the rupee, and produces a signed record that any lender, buyer or auditor can verify independently."</p>
+    <p class="quote">"Before funding an invoice, a lender needs four answers: is it real, was it delivered, will the buyer pay, and is it already financed elsewhere. Today those answers come from separate tools owned by separate parties, and nobody else can check them. Verbil answers all four in seconds, explains each answer with evidence down to the line and the rupee, and produces a signed record that any lender, buyer or auditor can verify independently."</p>
   </div>
 </section>
 
 <nav class="toc" aria-label="Chapters">
-  <a href="#c1">1 · Brief &amp; plan</a><a href="#c2">2 · Stack &amp; research</a><a href="#c3">3 · First build</a><a href="#c4">4 · "Doesn't this exist?"</a><a href="#c5">5 · Mentor feedback</a><a href="#c6">6 · Pitch wording</a><a href="#c7">7 · Payment reconciliation</a><a href="#c8">8 · Design</a><a href="#c9">9 · Bug on stage path</a><a href="#c10">10 · Final product</a><a href="#c11">11 · Sharing</a>
+  <a href="#c1">1 · Brief &amp; plan</a><a href="#c2">2 · Stack &amp; research</a><a href="#c3">3 · First build</a><a href="#c4">4 · "Doesn't this exist?"</a><a href="#c5">5 · Mentor feedback</a><a href="#c6">6 · Pitch wording</a><a href="#c7">7 · Payment reconciliation</a><a href="#c8">8 · Design</a><a href="#c9">9 · Bug on stage path</a><a href="#c10">10 · Final product</a><a href="#c11">11 · Sharing</a><a href="#c12">12 · Manual, repo, rename</a>
 </nav>
 
 <section class="chapter" id="c1">
@@ -186,11 +186,11 @@ footer{color:var(--muted);font-size:.84rem;border-top:1px solid var(--line);padd
   <h2><span>04</span>"Doesn't this exist?"</h2>
   <div class="msg user"><span class="who">Team</span><div class="bubble"><p>the idea already exists it seems</p></div></div>
   <div class="msg claude"><span class="who">Claude</span><div class="bubble">
-    <p>Parts of it do, which shows the problem is real. MonetaGo, TFM's Invoice Check and the TReDS platforms each cover one slice. VeriFin's edge: an open registry instead of a vendor one, a full pipeline instead of a dedup check alone, four duplicate layers, selective disclosure, on-chain buyer confirmation, and a provable audit trail.</p>
+    <p>Parts of it do, which shows the problem is real. MonetaGo, TFM's Invoice Check and the TReDS platforms each cover one slice. Verbil's edge: an open registry instead of a vendor one, a full pipeline instead of a dedup check alone, four duplicate layers, selective disclosure, on-chain buyer confirmation, and a provable audit trail.</p>
   </div></div>
   <div class="msg user"><span class="who">Team</span><div class="bubble"><p>how does it differ from billacle?</p></div></div>
   <div class="msg claude"><span class="who">Claude</span><div class="bubble">
-    <p>Billacle is accounts-payable automation for a buyer's finance team: invoice capture, approvals, GST/ITC reconciliation, Tally sync. It decides whether a company should pay a bill. VeriFin decides whether a lender should advance money against one, across lenders that can't see each other. The only overlap is invoice extraction.</p>
+    <p>Billacle is accounts-payable automation for a buyer's finance team: invoice capture, approvals, GST/ITC reconciliation, Tally sync. It decides whether a company should pay a bill. Verbil decides whether a lender should advance money against one, across lenders that can't see each other. The only overlap is invoice extraction.</p>
     <p class="quote">"AP tools like Billacle live on the buyer's side. In production, that's where our buyer confirmation would come from."</p>
   </div></div>
 </section>
@@ -277,6 +277,19 @@ footer{color:var(--muted);font-size:.84rem;border-top:1px solid var(--line);padd
   <div class="msg user"><span class="who">Team</span><div class="bubble"><p>okay how do i share this chat with my teammate? · okay where is the app? · can you make the chat as an artifact so i can send it?</p></div></div>
   <div class="msg claude"><span class="who">Claude</span><div class="bubble">
     <p>The app runs locally at <code>http://localhost:8000</code> on the build laptop while the servers are up; <code>start.bat</code> restarts everything. The raw transcript was exported as a zip to the Downloads folder, and this page is the readable version.</p>
+  </div></div>
+</section>
+
+<section class="chapter" id="c12">
+  <h2><span>12</span>Manual, repo, concepts guide, new name</h2>
+  <div class="msg user"><span class="who">Team</span><div class="bubble"><p>a guide with screenshots that tells me how to use this · create a repo · we have no knowledge of finances so we need a big guide that explains every concept · this is the logo and the new name</p></div></div>
+  <div class="msg claude"><span class="who">Claude</span><div class="bubble">
+    <ul>
+      <li><b>User manual</b> with 22 annotated screenshots of every screen, captured from the running app.</li>
+      <li><b>GitHub repo</b> (private) with <code>setup.bat</code> and <code>start.bat</code>, so a fresh laptop can run it.</li>
+      <li><b>Concepts guide</b>: money basics, invoice financing, documents, fraud, verification, risk, workflow, cryptography, blockchain, hybrid audit and privacy, with diagrams, a glossary and judge Q&amp;A.</li>
+      <li><b>Renamed to Verbil</b> everywhere: app, signed records (issuer <code>did:web:verbil.local</code>), README, manual and docs. The logo was cut out of its white background so it glows on the dark app, and is used in the header, on the homepage and as the tab icon.</li>
+    </ul>
   </div></div>
 </section>
 

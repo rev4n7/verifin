@@ -3,20 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VeriFin — Verified invoice financing</title>
+<title>Verbil — Verified invoice financing</title>
+<link rel="icon" type="image/png" href="/static/brand/verbil-mark.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="/static/style.css?v=22">
+<link rel="stylesheet" href="/static/style.css?v=31">
 </head>
 <body>
 <header class="top">
   <div class="top-inner">
     <div class="left">
-      <a class="brand" href="#" onclick="show('home');return false" aria-label="VeriFin home">
-        <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7"/></svg></span>
-        <b>VeriFin</b>
-      </a>
+      <a class="brand" href="#" onclick="show('home');return false" aria-label="Verbil home"><img class="wordmark" src="/static/brand/verbil-logo.png" alt="Verbil"></a>
       <div class="ws">
         <button class="ws-btn" id="ws-btn" aria-haspopup="true" aria-expanded="false"></button>
         <div class="ws-menu" id="ws-menu" hidden></div>
@@ -32,9 +30,10 @@
   <section id="view-home" class="view">
     <div class="landing">
       <div class="landing-copy">
+        <img class="hero-mark" src="/static/brand/verbil-logo.png" alt="Verbil">
         <span class="eyebrow">Invoice financing, verified</span>
         <h1>Verify the invoice.<br><span class="grad">Prove every decision.</span></h1>
-        <p class="lede">VeriFin checks an invoice against the purchase order, delivery, bank statement and every other lender in seconds, then turns the decision into proof anyone can verify on-chain.</p>
+        <p class="lede">Verbil checks an invoice against the purchase order, delivery, bank statement and every other lender in seconds, then turns the decision into proof anyone can verify on-chain.</p>
         <div class="row cta">
           <button class="btn primary lg" onclick="document.getElementById('workspaces').scrollIntoView({behavior:'smooth'})">Get started</button>
           <button class="btn secondary lg" onclick="setPersona('public')">Verify a record</button>
@@ -70,7 +69,7 @@
       <button class="space" onclick="setPersona('acme')"><span class="sp-ic" style="--c:#3fe0d0"><svg viewBox="0 0 24 24"><path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6h6v6"/></svg></span><b>For businesses</b><span>Upload an invoice, get an offer in seconds, and get paid today instead of in 60 days.</span><em>Open as Acme Precision Parts →</em></button>
       <button class="space" onclick="setPersona('lender_a')"><span class="sp-ic" style="--c:#4aa8ff"><svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg></span><b>For lenders</b><span>Every application arrives verified, scored and priced, with the evidence behind each decision.</span><em>Open as Shakti Bank →</em></button>
       <button class="space" onclick="setPersona('zenith')"><span class="sp-ic" style="--c:#ffb547"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12.5l2.5 2.5 5-5.5"/></svg></span><b>For buyers</b><span>Confirm or dispute invoices raised against you in one click. Confirmed invoices get suppliers better rates.</span><em>Open as Zenith Motors →</em></button>
-      <button class="space" onclick="setPersona('public')"><span class="sp-ic" style="--c:#9a9bff"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><b>For auditors</b><span>Check any VeriFin record or document against the blockchain. No account, no trust required.</span><em>Verify a record →</em></button>
+      <button class="space" onclick="setPersona('public')"><span class="sp-ic" style="--c:#9a9bff"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><b>For auditors</b><span>Check any Verbil record or document against the blockchain. No account, no trust required.</span><em>Verify a record →</em></button>
     </div>
 
     <div class="pipeline">
@@ -93,7 +92,7 @@
     <div class="stats" id="dash-kpis"></div>
     <div class="dash-grid">
       <div class="card"><h3>Needs your attention</h3><div id="dash-attention"></div></div>
-      <div class="card"><h3>Blocked by VeriFin</h3><div id="dash-blocked"></div></div>
+      <div class="card"><h3>Blocked by Verbil</h3><div id="dash-blocked"></div></div>
       <div class="card"><h3>Exposure by buyer</h3><div id="dash-exposure"></div></div>
       <div class="card"><h3>Consortium ledger</h3><div id="dash-network"></div></div>
     </div>
@@ -157,16 +156,16 @@
 
   <!-- PUBLIC VERIFY -->
   <section id="view-verify" class="view" hidden>
-    <div class="section-head"><div><span class="eyebrow">Public verification</span><h2>Don't trust. Verify.</h2><p>Check any VeriFin record or document yourself. Signatures and hashes are checked against the consortium ledger.</p></div></div>
+    <div class="section-head"><div><span class="eyebrow">Public verification</span><h2>Don't trust. Verify.</h2><p>Check any Verbil record or document yourself. Signatures and hashes are checked against the consortium ledger.</p></div></div>
     <div class="grid2">
       <div class="card">
-        <h3>Verify a VeriFin record</h3>
+        <h3>Verify a Verbil record</h3>
         <p class="muted">A signed record lists the documents, every rule applied, discrepancies found and the decision.</p>
         <label for="pv-record">Record (.json)</label><input type="file" id="pv-record" accept=".json">
         <label for="pv-docs">Documents you hold <em class="muted">optional, to check they haven't changed</em></label><input type="file" id="pv-docs" multiple>
         <div class="row"><button class="btn primary" id="pv-go">Verify record</button></div>
         <div id="pv-out"></div>
-        <p class="muted">Prefer the command line? <span class="mono">python tools/verify_record.py record.json invoice.pdf</span> reads the ledger directly, without VeriFin's servers.</p>
+        <p class="muted">Prefer the command line? <span class="mono">python tools/verify_record.py record.json invoice.pdf</span> reads the ledger directly, without Verbil's servers.</p>
       </div>
       <div class="card">
         <h3>Verify a document</h3>
@@ -209,6 +208,6 @@
 
 <div id="modal" class="modal" hidden><div class="modal-box"><button class="x" id="modal-x" aria-label="Close">×</button><div id="modal-body"></div></div></div>
 <div id="toast" class="toast" hidden></div>
-<script src="/static/app.js?v=22"></script>
+<script src="/static/app.js?v=31"></script>
 </body>
 </html>

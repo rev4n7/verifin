@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey,
 from core import DATA, canonical, fmt_inr, now_iso, sha256_hex
 
 _KEY = DATA / "issuer_ed25519.pem"
-ISSUER_ID = "did:web:verifin.local"
+ISSUER_ID = "did:web:verbil.local"
 
 
 def _priv():
@@ -109,10 +109,10 @@ def _normalize(o):
 def build_record(a: dict, docs: list, events: list, anchor_info: dict | None, chain_status: dict) -> dict:
     r = a.get("risk") or {}
     body = {
-        "@context": ["https://www.w3.org/ns/credentials/v2", "https://verifin.local/contexts/invoice-verification/v1"],
+        "@context": ["https://www.w3.org/ns/credentials/v2", "https://verbil.local/contexts/invoice-verification/v1"],
         "type": ["VerifiableCredential", "InvoiceVerificationRecord"],
-        "id": f"urn:verifin:record:{a['id']}:{a['fingerprint'][:12]}",
-        "issuer": {"id": ISSUER_ID, "name": "VeriFin verification service", "publicKeyEd25519": public_key_b64()},
+        "id": f"urn:verbil:record:{a['id']}:{a['fingerprint'][:12]}",
+        "issuer": {"id": ISSUER_ID, "name": "Verbil verification service", "publicKeyEd25519": public_key_b64()},
         "validFrom": now_iso(),
         "credentialSubject": {
             "invoiceFingerprint": a["fingerprint"],

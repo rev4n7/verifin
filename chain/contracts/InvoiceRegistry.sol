@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-/// @title VeriFin InvoiceRegistry
+/// @title Verbil InvoiceRegistry
 /// @notice Cross-lender double-financing registry + buyer confirmations + audit anchoring.
 /// Only keyed hashes (HMAC fingerprints) and Merkle roots are stored. No invoice data, no PII.
 contract InvoiceRegistry {

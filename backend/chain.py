@@ -6,7 +6,7 @@ import time
 
 from core import BASE, DATA, LENDERS
 
-RPC_URL = os.environ.get("VERIFIN_RPC", "http://127.0.0.1:8545")
+RPC_URL = os.environ.get("VERBIL_RPC", "http://127.0.0.1:8545")
 ARTIFACT = BASE / "chain" / "artifacts" / "contracts" / "InvoiceRegistry.sol" / "InvoiceRegistry.json"
 STATE = DATA / "chain.json"
 SIM = DATA / "simchain.json"

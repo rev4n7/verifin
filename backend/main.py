@@ -1,4 +1,4 @@
-"""VeriFin API: invoice financing with hybrid (off-chain + on-chain) audit."""
+"""Verbil API: invoice financing with hybrid (off-chain + on-chain) audit."""
 import json
 import os
 import time
@@ -24,7 +24,7 @@ from disclosure import commit, disclose
 from disclosure import verify as verify_disclosure
 from extract import claude_available, extract
 
-app = FastAPI(title="VeriFin")
+app = FastAPI(title="Verbil")
 SCENARIOS = {}
 
 

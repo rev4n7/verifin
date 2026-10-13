@@ -1,4 +1,4 @@
-<title>VeriFin User Manual</title>
+<title>Verbil User Manual</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap">
 <style>
@@ -79,7 +79,7 @@ dl.faq dd{margin:4px 0 0;color:var(--ink-2)}
 <div class="page">
 <nav class="rail" aria-label="Contents">
   <b>Start</b>
-  <a href="#intro">What VeriFin is</a>
+  <a href="#intro">What Verbil is</a>
   <a href="#open">Opening the app</a>
   <a href="#basics">Getting around</a>
   <b>Guides</b>
@@ -95,15 +95,16 @@ dl.faq dd{margin:4px 0 0;color:var(--ink-2)}
 
 <main>
   <section class="intro" id="intro">
+    <img src="img/verbil-logo.png" alt="Verbil" style="height:84px;width:auto;margin-left:-12px;filter:drop-shadow(0 0 20px rgba(167,139,250,.35))">
     <span class="eyebrow">User manual</span>
-    <h1>VeriFin User Manual</h1>
-    <p class="lede">VeriFin checks an invoice before a lender pays out against it: is it real, was it delivered, will the buyer pay, and has anyone financed it already. This manual walks through every screen. Yellow numbers in the text match the yellow markers on the screenshots.</p>
+    <h1>Verbil User Manual</h1>
+    <p class="lede">Verbil checks an invoice before a lender pays out against it: is it real, was it delivered, will the buyer pay, and has anyone financed it already. This manual walks through every screen. Yellow numbers in the text match the yellow markers on the screenshots.</p>
     <div class="tbl"><table>
       <tr><th>Workspace</th><th>Who it's for</th><th>What you do there</th></tr>
       <tr><td><b>Shakti Bank</b>, <b>Kaveri Capital</b></td><td>Lenders</td><td>Review verified applications, see the evidence, pay out, monitor the portfolio and audit trail</td></tr>
       <tr><td><b>Acme Precision Parts</b></td><td>A small business (supplier)</td><td>Upload an unpaid invoice, get an offer, track it to payout</td></tr>
       <tr><td><b>Zenith Motors</b>, <b>Orbit Retail</b></td><td>Buyers who owe the money</td><td>Confirm or dispute invoices raised against them</td></tr>
-      <tr><td><b>Independent verifier</b></td><td>Auditors, anyone</td><td>Check a VeriFin record or document against the blockchain</td></tr>
+      <tr><td><b>Independent verifier</b></td><td>Auditors, anyone</td><td>Check a Verbil record or document against the blockchain</td></tr>
     </table></div>
   </section>
 
@@ -111,7 +112,7 @@ dl.faq dd{margin:4px 0 0;color:var(--ink-2)}
     <div class="part-head"><span class="eyebrow">Before you start</span><h2>Opening the app</h2></div>
     <div class="step">
       <ol>
-        <li><span class="n">1</span><span>On the laptop where VeriFin is installed, double-click <code>start.bat</code> in the <code>verifin</code> folder. Two terminal windows open: the blockchain node and the app server. Keep both open.</span></li>
+        <li><span class="n">1</span><span>On the laptop where Verbil is installed, double-click <code>start.bat</code> in the project folder. Two terminal windows open: the blockchain node and the app server. Keep both open.</span></li>
         <li><span class="n">2</span><span>Your browser opens <code>http://localhost:8000</code>. If it doesn't, type that address into Chrome or Edge.</span></li>
         <li><span class="n">3</span><span>For presenting, press <b>F11</b> for fullscreen.</span></li>
       </ol>
@@ -128,7 +129,7 @@ dl.faq dd{margin:4px 0 0;color:var(--ink-2)}
         <li><span class="n">2</span><span><b>Get started</b> scrolls to the workspace cards.</span></li>
         <li><span class="n">3</span><span>The faint <b>▶ button</b> opens the presenter tools (see section 2).</span></li>
       </ol>
-      <figure><img src="img/01-home.jpg" alt="VeriFin home page with the workspace button, Get started button and presenter button highlighted" loading="lazy"><figcaption>Home page. Click the VeriFin logo any time to come back here.</figcaption></figure>
+      <figure><img src="img/01-home.jpg" alt="Verbil home page with the workspace button, Get started button and presenter button highlighted" loading="lazy"><figcaption>Home page. Click the Verbil logo any time to come back here.</figcaption></figure>
     </div>
     <div class="step" id="switch">
       <div class="step-head"><span class="no">1.2</span><h3>Switching workspace</h3></div>
@@ -171,7 +172,7 @@ dl.faq dd{margin:4px 0 0;color:var(--ink-2)}
       <ol>
         <li><span class="n">1</span><span><b>Portfolio numbers:</b> paid out, live exposure, approval rate, ₹ of fraud blocked, average decision time.</span></li>
         <li><span class="n">2</span><span><b>Needs your attention:</b> applications waiting for a decision or a payout. Click one to open it.</span></li>
-        <li><span class="n">3</span><span><b>Blocked by VeriFin:</b> every rejected application with its reason and amount.</span></li>
+        <li><span class="n">3</span><span><b>Blocked by Verbil:</b> every rejected application with its reason and amount.</span></li>
       </ol>
       <figure><img src="img/07-lender-dashboard.jpg" alt="Lender dashboard with KPI strip, attention queue and blocked list highlighted" loading="lazy"><figcaption>Below: exposure by buyer and the ledger status.</figcaption></figure>
     </div>
@@ -255,7 +256,7 @@ dl.faq dd{margin:4px 0 0;color:var(--ink-2)}
   </section>
 
   <section class="part" id="proof">
-    <div class="part-head"><span class="eyebrow">Section 6</span><h2>Proof &amp; audit</h2><p>Every decision can be proven to someone who doesn't trust VeriFin.</p></div>
+    <div class="part-head"><span class="eyebrow">Section 6</span><h2>Proof &amp; audit</h2><p>Every decision can be proven to someone who doesn't trust Verbil.</p></div>
     <div class="step">
       <div class="step-head"><span class="no">6.1</span><h3>Issue a verification record</h3></div>
       <p>As Shakti Bank, open the funded invoice INV-2026-1001, go to the <b>Verification record</b> tab and click <b>Issue signed record</b>. It lists the documents (as fingerprints), every rule applied and its result, and the decision. It's signed and anchored on-chain. Click <b>Download record</b> to save it.</p>

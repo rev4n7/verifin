@@ -1,4 +1,4 @@
-<title>VeriFin Playbook</title>
+<title>Verbil Playbook</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
@@ -97,7 +97,7 @@ dd{margin:0;color:var(--muted)}
 
 <header class="hero">
   <span class="stamp">TEAM BRIEFING · READ FIRST</span>
-  <h1>VeriFin: verify the invoice, then fund it</h1>
+  <h1>Verbil: verify the invoice, then fund it</h1>
   <p class="lede">The problem statement in plain words, what we're building, why it's different from what other teams will build, and the exact demo we'll run for the judges.</p>
 </header>
 
@@ -122,7 +122,7 @@ dd{margin:0;color:var(--muted)}
 <section>
   <span class="eyebrow">2 · What we're building</span>
   <h2>A platform that checks an invoice in seconds and explains every decision</h2>
-  <p>The SME uploads three documents: the <b>invoice</b>, the buyer's <b>purchase order (PO)</b>, and the signed <b>delivery receipt (GRN)</b>. VeriFin runs them through this pipeline:</p>
+  <p>The SME uploads three documents: the <b>invoice</b>, the buyer's <b>purchase order (PO)</b>, and the signed <b>delivery receipt (GRN)</b>. Verbil runs them through this pipeline:</p>
   <div class="pipe">
     <div class="step"><b>Extract</b><span>Read the PDFs into structured data: parties, tax IDs, items, totals, dates.</span></div>
     <div class="step"><b>Forensics</b><span>Inspect the PDF file itself for signs it was edited after creation.</span></div>
@@ -176,7 +176,7 @@ dd{margin:0;color:var(--muted)}
       <tr><td><b>MonetaGo</b></td><td>Closed fingerprint registry banks pay to join; reports TReDS platforms use it</td><td>No verification, risk, pricing or audit. Vendor-controlled. Can't catch a renumbered invoice.</td></tr>
       <tr><td><b>Billacle</b></td><td>AP automation for a buyer's finance team: AI invoice capture, approvals, GST/ITC reconciliation, Tally sync</td><td>Not a lending product. Duplicate checks stay inside one company's books. No cross-lender view, risk, or audit proof.</td></tr>
       <tr><td><b>TReDS platforms</b></td><td>RBI-regulated marketplaces where MSMEs auction invoices to financiers</td><td>Each platform is its own silo, and verification relies on buyer acceptance plus manual checks.</td></tr>
-      <tr><td><b>VeriFin</b></td><td>Full pipeline: extraction → forensics → 3-way match → 4-layer dedup → risk → pricing → anchored audit</td><td>Open registry, buyer attestation and selective disclosure, in one working demo.</td></tr>
+      <tr><td><b>Verbil</b></td><td>Full pipeline: extraction → forensics → 3-way match → 4-layer dedup → risk → pricing → anchored audit</td><td>Open registry, buyer attestation and selective disclosure, in one working demo.</td></tr>
     </tbody>
   </table></div>
   <p><b>Line to use:</b> "AP tools like Billacle live on the buyer's side. In production, that's where our buyer confirmation would come from. MonetaGo proves banks pay for duplicate checks. We made that open and verifiable, and built the whole lending decision around it."</p>
@@ -210,7 +210,7 @@ dd{margin:0;color:var(--muted)}
   <span class="eyebrow">5 · Brief → feature map</span>
   <h2>Every bullet in the problem statement is covered</h2>
   <div class="tbl"><table>
-    <thead><tr><th>Brief asks for</th><th>VeriFin feature</th></tr></thead>
+    <thead><tr><th>Brief asks for</th><th>Verbil feature</th></tr></thead>
     <tbody>
       <tr><td>Invoice data extraction</td><td>PDF parser (offline) + optional Claude AI extraction for any layout</td></tr>
       <tr><td>Cross-checks vs PO, delivery, contracts</td><td>3-way match with line-level evidence; PO over-billing ledger</td></tr>
