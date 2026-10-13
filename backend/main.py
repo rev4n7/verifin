@@ -257,6 +257,51 @@ def list_apps(lender_id: str | None = None, seller_gstin: str | None = None, buy
         return out
 
 
+BLOCK_REASONS = ["Duplicate financing", "Tampered document", "PO over-billed", "Already paid", "Disputed by buyer", "Risk too high"]
+
+
+def _block_reason(r):
+    s = r.get("stop") or ""
+    if r["status"] == "DISPUTED":
+        return "Disputed by buyer"
+    for prefix, label in (("Duplicate", "Duplicate financing"), ("Invoice already paid", "Already paid"),
+                          ("Purchase order", "PO over-billed"), ("Document shows", "Tampered document")):
+        if s.startswith(prefix):
+            return label
+    return "Risk too high"
+
+
+def _fy_quarter(d):
+    """Indian financial year quarter, e.g. 2026-05-10 -> (2026, 1, 'Q1 FY27')."""
+    fy = d.year + 1 if d.month >= 4 else d.year
+    q = (d.month - 4) % 12 // 3 + 1
+    return (fy, q), f"Q{q} FY{fy % 100:02d}"
+
+
+def buyer_payment_trend(c):
+    """Average days paid after due date, per buyer per quarter (from the payment-history bureau)."""
+    buyers = c.execute("SELECT gstin, name FROM companies WHERE role='buyer' ORDER BY chain_account").fetchall()
+    rows = c.execute("SELECT buyer_gstin, due_date, paid_date FROM payment_history WHERE paid_date IS NOT NULL").fetchall()
+    cells, keys = {}, {}
+    for r in rows:
+        due, paid = risk._d(r["due_date"]), risk._d(r["paid_date"])
+        if not due or not paid:
+            continue
+        key, label = _fy_quarter(due)
+        keys[key] = label
+        cells.setdefault((r["buyer_gstin"], key), []).append(max((paid - due).days, 0))
+    order = sorted(keys)
+    series = []
+    for b in buyers:
+        pts = []
+        for k in order:
+            v = cells.get((b["gstin"], k))
+            pts.append({"avg": round(sum(v) / len(v), 1), "n": len(v)} if v else None)
+        if any(pts):
+            series.append({"buyer": b["name"], "gstin": b["gstin"], "points": pts})
+    return {"quarters": [keys[k] for k in order], "series": series, "terms_days": 60}
+
+
 @app.get("/api/lenders/{lender_id}/dashboard")
 def lender_dashboard(lender_id: str):
     rows = list_apps(lender_id=lender_id)
@@ -269,14 +314,40 @@ def lender_dashboard(lender_id: str):
     exposure = {}
     for r in live:
         exposure[r["buyer_name"]] = exposure.get(r["buyer_name"], 0) + (r["amount"] or 0)
+    total_live = sum(exposure.values())
+
+    def stage(label, subset):
+        return {"stage": label, "count": len(subset), "amount": sum(r["amount"] or 0 for r in subset)}
+    passed = [r for r in rows if r["status"] in ("MANUAL_REVIEW", "AUTO_APPROVED", "APPROVED", "FUNDED", "REPAID")]
+    by_reason = {k: {"reason": k, "count": 0, "amount": 0} for k in BLOCK_REASONS}
+    for r in blocked:
+        b = by_reason[_block_reason(r)]
+        b["count"] += 1
+        b["amount"] += r["amount"] or 0
+    chrono = sorted(rows, key=lambda r: r["id"])
+    with db() as c:
+        trend = buyer_payment_trend(c)
     return {"lender": LENDERS.get(lender_id),
             "kpis": {"applications": len(rows), "approval_rate": (len(approved) / len(decided)) if decided else None,
-                     "disbursed": sum(r["net"] or 0 for r in funded), "exposure": sum(r["amount"] or 0 for r in live),
+                     "disbursed": sum(r["net"] or 0 for r in funded), "funded_count": len(funded),
+                     "exposure": sum(r["amount"] or 0 for r in live), "live_count": len(live),
                      "blocked": len(blocked), "blocked_value": sum(r["amount"] or 0 for r in blocked),
-                     "avg_decision_ms": round(sum(ms) / len(ms)) if ms else None},
+                     "decided": len(decided), "avg_decision_ms": round(sum(ms) / len(ms)) if ms else None},
             "attention": [r for r in rows if r["status"] in ("MANUAL_REVIEW", "AUTO_APPROVED", "APPROVED")],
             "blocked": blocked[:8],
-            "exposure_by_buyer": sorted(({"buyer": k, "amount": v} for k, v in exposure.items()), key=lambda x: -x["amount"]),
+            "exposure_by_buyer": sorted(({"buyer": k, "amount": v, "share": v / total_live} for k, v in exposure.items()),
+                                        key=lambda x: -x["amount"]),
+            "funnel": [stage("Received", rows), stage("Passed verification", passed), stage("Offer made", approved),
+                       stage("Funded", funded), stage("Repaid", [r for r in rows if r["status"] == "REPAID"])],
+            "blocked_by_reason": list(by_reason.values()),
+            "scores": [{"id": r["id"], "invoice_no": r["invoice_no"], "score": r["score"], "grade": r["grade"],
+                        "status": r["status"], "hard_stop": bool(r["stop"]), "seller": r["seller_name"],
+                        "buyer": r["buyer_name"], "amount": r["amount"]} for r in chrono if r["score"] is not None],
+            "decision_times": [{"id": r["id"], "invoice_no": r["invoice_no"], "ms": r["ms"], "status": r["status"]}
+                               for r in chrono if r["ms"]],
+            "payment_trend": trend,
+            "upcoming": [{"id": r["id"], "invoice_no": r["invoice_no"], "buyer_name": r["buyer_name"], "amount": r["amount"],
+                          "due_date": r["due_date"]} for r in sorted(live, key=lambda r: r["due_date"] or "")],
             "recent": rows[:8]}
 
 

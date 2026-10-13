@@ -37,7 +37,7 @@ Switch between workspaces with the button next to the logo:
 
 | Workspace | Role | Screens |
 |---|---|---|
-| Shakti Bank, Kaveri Capital | Lenders | Dashboard, Applications (evidence tabs, approve, disburse), Audit |
+| Shakti Bank, Kaveri Capital | Lenders | Dashboard (portfolio KPIs and charts: funnel, fraud blocked by reason, buyer payment trend, risk scores vs policy, decision time), Applications (evidence tabs, approve, disburse), Audit |
 | Acme Precision Parts | Business | My invoices (stage timeline), Get paid early (upload) |
 | Zenith Motors, Orbit Retail | Buyers | Confirmations: confirm (signed on-chain) or dispute |
 | Independent verifier | Anyone | Verify a signed record or a document against the chain |

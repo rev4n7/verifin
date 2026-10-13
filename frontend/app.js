@@ -493,35 +493,361 @@ $("#doc-check").onchange = async (e) => {
     : `<div class="ok-big badx"><b>✕ Unknown file</b><span>${esc(r.message)}</span></div><p class="hash">${r.sha256}</p>`;
 };
 
+/* ---------------- charts: hand-rolled SVG, no libraries ---------------- */
+// Categorical slots validated (dark mode, all-pairs) against the chart surface #0b1633.
+const VZ = { s: ["#3987e5", "#d95926", "#199e70"], good: "#0ca30c", warn: "#fab219", crit: "#d03b3b",
+  surface: "#0b1633", grid: "rgba(255,255,255,.07)", axis: "rgba(255,255,255,.2)", ink: "#f2f6ff", ink2: "#c9d6ee", muted: "#93a6c6" };
+const inrShort = (v) => {
+  if (v == null) return "—";
+  const f = (x) => String(+x.toFixed(x >= 100 ? 0 : x >= 10 ? 1 : 2));
+  return "₹" + (v >= 1e7 ? f(v / 1e7) + " Cr" : v >= 1e5 ? f(v / 1e5) + " L" : v >= 1e3 ? f(v / 1e3) + "K" : Math.round(v));
+};
+const fmtMs = (ms) => (ms == null ? "—" : ms < 1000 ? `${Math.round(ms)} ms` : `${+(ms / 1000).toFixed(ms < 10000 ? 2 : 1)} s`);
+const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+const shortName = (s) => String(s || "").replace(/ (Ltd|Limited|Pvt\.? Ltd)\.?$/i, "");
+function niceScale(max, n = 4) {
+  if (!(max > 0)) return { max: n, step: 1 };
+  const raw = max / n, p = 10 ** Math.floor(Math.log10(raw)), m = raw / p;
+  const step = (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p;
+  return { max: Math.ceil(max / step - 1e-9) * step, step };
+}
+// bars: 4px rounded data end, square at the baseline
+function hbarPath(x, y, w, h, r = 4) {
+  if (w <= 0.5) return "";
+  r = Math.min(r, w, h / 2);
+  return `M${x},${y}H${x + w - r}A${r},${r} 0 0 1 ${x + w},${y + r}V${y + h - r}A${r},${r} 0 0 1 ${x + w - r},${y + h}H${x}Z`;
+}
+function vbarPath(x, base, w, h, r = 4) {
+  if (h <= 0.5) return "";
+  r = Math.min(r, h, w / 2);
+  const y = base - h;
+  return `M${x},${base}V${y + r}A${r},${r} 0 0 1 ${x + r},${y}H${x + w - r}A${r},${r} 0 0 1 ${x + w},${y + r}V${base}Z`;
+}
+const svgText = (x, y, s, { fill = VZ.muted, size = 11, anchor = "start", weight = 400, halo = false, cls = "" } = {}) =>
+  `<text x="${x}" y="${y}" fill="${fill}" font-size="${size}" font-weight="${weight}" text-anchor="${anchor}" dominant-baseline="middle"${cls ? ` class="${cls}"` : ""}${halo ? ` stroke="${VZ.surface}" stroke-width="4" paint-order="stroke" stroke-linejoin="round"` : ""}>${esc(s)}</text>`;
+
+/* tooltip: labels can come from parsed documents, so it is built with textContent only */
+function tipShow(t, cx, cy) {
+  const el = $("#viz-tip");
+  el.replaceChildren();
+  const add = (tag, cls, text, parent = el) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; parent.append(n); return n; };
+  add("div", "tt-h", t.title);
+  for (const r of t.rows || []) {
+    const row = add("div", "tt-r");
+    if (r.color) add("i", r.shape === "x" ? "x" : r.shape === "dot" ? "dot" : "", null, row).style.setProperty("--k", r.color);
+    add("b", "", r.value, row);
+    if (r.label) add("span", "", r.label, row);
+  }
+  if (t.note) add("div", "tt-n", t.note);
+  el.hidden = false;
+  const w = el.offsetWidth, h = el.offsetHeight;
+  let x = cx + 14, y = cy - h - 12;
+  if (x + w > innerWidth - 8) x = cx - w - 14;
+  if (y < 8) y = cy + 16;
+  el.style.transform = `translate(${Math.round(Math.max(8, x))}px,${Math.round(y)}px)`;
+}
+const tipHide = () => { const el = $("#viz-tip"); if (el) el.hidden = true; };
+addEventListener("scroll", tipHide, { passive: true });
+
+const VIZ = {}; // card id -> { spec, mode }
+function vizCard(id, spec) {
+  VIZ[id] = { spec, mode: VIZ[id]?.mode || "chart" };
+  vizRender(id);
+}
+function vizRender(id) {
+  const el = document.getElementById(id), { spec, mode } = VIZ[id];
+  const legend = spec.legend?.length && mode === "chart"
+    ? `<div class="viz-legend">${spec.legend.map((l) => `<span><i class="k-${l.shape || "rect"}" style="--k:${l.color}"></i>${esc(l.label)}</span>`).join("")}</div>` : "";
+  el.innerHTML = `<div class="viz-head"><div><h3>${esc(spec.title)}</h3>${spec.sub ? `<p>${esc(spec.sub)}</p>` : ""}</div>
+      <div class="viz-tabs" role="group" aria-label="Show as"><button data-m="chart" class="${mode === "chart" ? "on" : ""}">Chart</button><button data-m="table" class="${mode === "table" ? "on" : ""}">Table</button></div></div>
+    ${spec.figure ? `<div class="viz-fig"><b>${spec.figure}</b>${spec.figureNote ? `<span>${esc(spec.figureNote)}</span>` : ""}</div>` : ""}
+    ${legend}<div class="viz-body"></div>${spec.after || ""}${spec.foot ? `<p class="viz-foot">${esc(spec.foot)}</p>` : ""}`;
+  $$(".viz-after [data-open]", el).forEach((b) => (b.onclick = () => openApp(+b.dataset.open)));
+  $$(".viz-tabs button", el).forEach((b) => (b.onclick = () => { VIZ[id].mode = b.dataset.m; vizRender(id); }));
+  const body = $(".viz-body", el);
+  if (mode === "table") {
+    body.innerHTML = `<div class="tbl viz-table">${spec.table()}</div>`;
+    return;
+  }
+  const out = spec.draw(Math.max(260, Math.floor(body.clientWidth)));
+  if (out.empty) {
+    body.innerHTML = `<div class="viz-empty">${esc(out.empty)}</div>`;
+    return;
+  }
+  body.innerHTML = out.svg;
+  const tips = out.tips || [];
+  $$("[data-t]", body).forEach((m) => {
+    const t = tips[+m.dataset.t];
+    m.addEventListener("pointermove", (e) => tipShow(t, e.clientX, e.clientY));
+    m.addEventListener("pointerleave", tipHide);
+    m.addEventListener("focus", () => { const r = m.getBoundingClientRect(); tipShow(t, r.left + r.width / 2, r.top); });
+    m.addEventListener("blur", tipHide);
+    if (m.dataset.open) {
+      m.addEventListener("click", () => { tipHide(); openApp(+m.dataset.open); });
+      m.addEventListener("keydown", (e) => { if (e.key === "Enter") { tipHide(); openApp(+m.dataset.open); } });
+    }
+  });
+  if (out.crosshair) wireCrosshair(body, out.crosshair);
+}
+let vizResizeT;
+addEventListener("resize", () => {
+  clearTimeout(vizResizeT);
+  vizResizeT = setTimeout(() => state.view === "dash" && Object.keys(VIZ).forEach(vizRender), 160);
+});
+
+/* horizontal bars: one series, value at the tip */
+function drawHBars(w, rows, { max, empty }) {
+  const longest = Math.max(0, ...rows.map((r) => String(r.label).length)), valueW = 96;
+  const labelW = Math.min(170, Math.max(72, Math.ceil(longest * 7.1) + 16)), x0 = labelW, span = Math.max(40, w - labelW - valueW);
+  const rowH = 38, bh = 20;
+  const sc = max > 0 ? span / max : 0, h = rows.length * rowH + 4;
+  const g = rows.map((r, i) => {
+    const y = i * rowH + 2, len = r.value * sc, by = y + (rowH - bh) / 2, cy = y + rowH / 2;
+    return `<g class="vmark" data-t="${i}" tabindex="0" role="img" aria-label="${esc(r.label)}: ${esc(r.display)}"${r.open ? ` data-open="${r.open}"` : ""}>
+      <rect x="0" y="${y}" width="${w}" height="${rowH}" fill="transparent"/>
+      ${svgText(0, cy, r.label, { fill: VZ.ink2, size: 12.5 })}
+      <rect x="${x0}" y="${cy}" width="${span}" height="1" fill="${VZ.grid}"/>
+      <path class="mk" d="${hbarPath(x0, by, len, bh)}" fill="${VZ.s[0]}"/>
+      ${svgText(x0 + len + (len > 0.5 ? 8 : 0), cy, r.display, { fill: r.value ? VZ.ink : VZ.muted, size: 12.5, weight: r.value ? 600 : 400, cls: "tn" })}
+    </g>`;
+  }).join("");
+  return { svg: `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="viz-svg">${g}</svg>`, tips: rows.map((r) => r.tip), empty };
+}
+
+/* multi-series line with crosshair */
+function drawLines(w, { labels, series, threshold }) {
+  const h = 250, ends = w >= 520, m = { l: 34, r: ends ? 122 : 14, t: 14, b: 30 };
+  const pw = w - m.l - m.r, ph = h - m.t - m.b;
+  const vals = series.flatMap((s) => s.points.filter(Boolean).map((p) => p.avg));
+  const { max, step } = niceScale(Math.max(threshold ? threshold * 1.15 : 0, ...vals, 1), 5);
+  const X = (i) => m.l + 10 + (labels.length > 1 ? (i * (pw - 20)) / (labels.length - 1) : (pw - 20) / 2);
+  const Y = (v) => m.t + ph - (v / max) * ph;
+  let g = "";
+  for (let v = 0; v <= max + 1e-9; v += step) {
+    g += `<rect x="${m.l}" y="${Y(v)}" width="${pw}" height="1" fill="${v === 0 ? VZ.axis : VZ.grid}"/>` + svgText(m.l - 8, Y(v), v, { anchor: "end", cls: "tn" });
+  }
+  const every = Math.ceil(labels.length / Math.max(1, Math.floor(pw / 64)));
+  labels.forEach((l, i) => { if (i % every === 0 || i === labels.length - 1) g += svgText(X(i), h - 12, l, { anchor: "middle" }); });
+  if (threshold && threshold <= max) {
+    g += `<line x1="${m.l}" x2="${m.l + pw}" y1="${Y(threshold)}" y2="${Y(threshold)}" stroke="${VZ.muted}" stroke-opacity=".55" stroke-dasharray="4 4"/>`
+      + svgText(m.l + 6, Y(threshold) - 9, `${threshold} days late: risk score penalty`, { halo: true, size: 10.5 });
+  }
+  const endLabels = [];
+  series.forEach((s, si) => {
+    const color = VZ.s[si];
+    let d = "", pen = false;
+    s.points.forEach((p, i) => {
+      if (!p) { pen = false; return; }
+      d += `${pen ? "L" : "M"}${X(i).toFixed(1)},${Y(p.avg).toFixed(1)}`;
+      pen = true;
+    });
+    g += `<path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    s.points.forEach((p, i) => { // lone points between gaps still need a mark
+      if (p && !s.points[i - 1] && !s.points[i + 1]) g += `<circle cx="${X(i)}" cy="${Y(p.avg)}" r="3" fill="${color}"/>`;
+    });
+    const li = s.points.map((p, i) => (p ? i : -1)).filter((i) => i >= 0).pop();
+    if (li != null) {
+      g += `<circle cx="${X(li)}" cy="${Y(s.points[li].avg)}" r="4" fill="${color}" stroke="${VZ.surface}" stroke-width="2"/>`;
+      endLabels.push({ y: Y(s.points[li].avg), x: X(li), text: shortName(s.buyer) });
+    }
+  });
+  const sorted = [...endLabels].sort((a, b) => a.y - b.y);
+  if (ends && sorted.every((l, i) => !i || l.y - sorted[i - 1].y >= 15)) {
+    endLabels.forEach((l) => (g += svgText(l.x + 10, l.y, l.text, { fill: VZ.ink2, size: 12 })));
+  }
+  const xh = `<line class="xh" x1="0" x2="0" y1="${m.t}" y2="${m.t + ph}" stroke="${VZ.ink}" stroke-opacity=".35" visibility="hidden"/>
+    ${series.map((s, si) => `<circle class="xd" data-s="${si}" r="4.5" fill="${VZ.s[si]}" stroke="${VZ.surface}" stroke-width="2" visibility="hidden"/>`).join("")}
+    <rect class="xhit" x="${m.l}" y="${m.t}" width="${pw}" height="${ph}" fill="transparent" tabindex="0" role="img" aria-label="Average days paid late by quarter. Use arrow keys to step through quarters."/>`;
+  return {
+    svg: `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="viz-svg">${g}${xh}</svg>`,
+    crosshair: { n: labels.length, X, Y, w, series,
+      tip: (i) => ({ title: `${labels[i]} · due dates in this quarter`,
+        rows: series.map((s, si) => ({ color: VZ.s[si], value: s.points[i] ? `${s.points[i].avg} days` : "no invoices",
+          label: `${shortName(s.buyer)}${s.points[i] ? ` · ${plural(s.points[i].n, "invoice")}` : ""}` })) }) },
+  };
+}
+function wireCrosshair(body, c) {
+  const svg = $("svg", body), hit = $(".xhit", svg), line = $(".xh", svg), dots = $$(".xd", svg);
+  let cur = -1;
+  const at = (i, cx, cy) => {
+    cur = i;
+    line.setAttribute("x1", c.X(i)); line.setAttribute("x2", c.X(i)); line.setAttribute("visibility", "visible");
+    dots.forEach((d) => {
+      const p = c.series[+d.dataset.s].points[i];
+      d.setAttribute("visibility", p ? "visible" : "hidden");
+      if (p) { d.setAttribute("cx", c.X(i)); d.setAttribute("cy", c.Y(p.avg)); }
+    });
+    tipShow(c.tip(i), cx, cy);
+  };
+  const off = () => { line.setAttribute("visibility", "hidden"); dots.forEach((d) => d.setAttribute("visibility", "hidden")); tipHide(); };
+  const nearest = (sx) => { let b = 0; for (let i = 1; i < c.n; i++) if (Math.abs(c.X(i) - sx) < Math.abs(c.X(b) - sx)) b = i; return b; };
+  hit.addEventListener("pointermove", (e) => {
+    const r = svg.getBoundingClientRect();
+    at(nearest(((e.clientX - r.left) * c.w) / r.width), e.clientX, e.clientY);
+  });
+  hit.addEventListener("pointerleave", off);
+  const kb = (i) => { const r = svg.getBoundingClientRect(); at(i, r.left + (c.X(i) * r.width) / c.w, r.top + 10); };
+  hit.addEventListener("focus", () => kb(c.n - 1));
+  hit.addEventListener("blur", off);
+  hit.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); kb(Math.max(0, Math.min(c.n - 1, cur + (e.key === "ArrowLeft" ? -1 : 1)))); }
+  });
+}
+
+/* risk score strip against the decision policy */
+function drawScoreStrip(w, apps) {
+  const m = { l: 10, r: 10, t: 30, b: 28 }, pw = w - m.l - m.r, X = (s) => m.l + (Math.max(0, Math.min(100, s)) / 100) * pw;
+  const lanes = [];
+  const placed = [...apps].map((a, i) => ({ a, i })).sort((p, q) => p.a.score - q.a.score).map((p) => {
+    const x = X(p.a.score);
+    let l = 0;
+    while ((lanes[l] || []).some((px) => Math.abs(px - x) < 16)) l++;
+    (lanes[l] = lanes[l] || []).push(x);
+    return { ...p, x, lane: l };
+  });
+  const laneH = 18, ph = Math.max(132, lanes.length * laneH + 40), h = m.t + ph + m.b, base = m.t + ph / 2 + ((lanes.length - 1) * laneH) / 2;
+  const zones = [[0, 45, VZ.crit, "✕ Decline", "below 45"], [45, 75, VZ.warn, "! Manual review", "45–74"], [75, 100, VZ.good, "✓ Auto-approve", "75+"]];
+  let g = zones.map(([a, b, c, name]) => `<rect x="${X(a)}" y="${m.t}" width="${X(b) - X(a)}" height="${ph}" fill="${c}" fill-opacity=".07"/>`
+    + svgText(X(a) + 8, m.t - 14, name, { fill: VZ.ink2, size: 11.5, weight: 600 })).join("");
+  g += [45, 75].map((v) => `<rect x="${X(v)}" y="${m.t}" width="1" height="${ph}" fill="${VZ.axis}"/>`).join("");
+  g += `<rect x="${m.l}" y="${m.t + ph}" width="${pw}" height="1" fill="${VZ.axis}"/>`;
+  g += [0, 45, 75, 100].map((v) => svgText(X(v), m.t + ph + 14, v, { anchor: v === 0 ? "start" : v === 100 ? "end" : "middle", cls: "tn" })).join("");
+  g += placed.map(({ a, i, x, lane }) => {
+    const y = base - lane * laneH;
+    const mark = a.hard_stop
+      ? `<path d="M${x - 5},${y - 5}L${x + 5},${y + 5}M${x + 5},${y - 5}L${x - 5},${y + 5}" stroke="${VZ.surface}" stroke-width="6" stroke-linecap="round"/><path class="mk" d="M${x - 5},${y - 5}L${x + 5},${y + 5}M${x + 5},${y - 5}L${x - 5},${y + 5}" stroke="${VZ.crit}" stroke-width="2.5" stroke-linecap="round"/>`
+      : `<circle class="mk" cx="${x}" cy="${y}" r="6" fill="${VZ.s[0]}" stroke="${VZ.surface}" stroke-width="2"/>`;
+    return `<g class="vmark" data-t="${i}" data-open="${a.id}" tabindex="0" role="img" aria-label="${esc(a.invoice_no)}: score ${a.score}"><circle cx="${x}" cy="${y}" r="13" fill="transparent"/>${mark}</g>`;
+  }).join("");
+  return { svg: `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="viz-svg">${g}</svg>`,
+    tips: apps.map((a) => ({ title: a.invoice_no, rows: [
+      { color: a.hard_stop ? VZ.crit : VZ.s[0], shape: a.hard_stop ? "x" : "dot", value: `${a.score} / 100`, label: `grade ${a.grade}` },
+      { value: STATUS[a.status] || a.status, label: a.hard_stop ? "hard stop overrides the score" : "" }],
+      note: `${shortName(a.seller)} → ${shortName(a.buyer)} · ${inr(a.amount)} · click to open` })),
+    empty: apps.length ? null : "No scored applications yet" };
+}
+
+/* columns: one per application */
+function drawColumns(w, items) {
+  const h = 210, m = { l: 40, r: 8, t: 14, b: 30 }, pw = w - m.l - m.r, ph = h - m.t - m.b, base = m.t + ph;
+  const vals = items.map((d) => d.ms), { max, step } = niceScale(Math.max(...vals, 10), 4);
+  const slot = pw / Math.max(items.length, 1), cw = Math.min(24, slot * 0.62), Y = (v) => (v / max) * ph;
+  let g = "";
+  for (let v = 0; v <= max + 1e-9; v += step) {
+    g += `<rect x="${m.l}" y="${base - Y(v)}" width="${pw}" height="1" fill="${v === 0 ? VZ.axis : VZ.grid}"/>` + svgText(m.l - 8, base - Y(v), fmtMs(v), { anchor: "end", cls: "tn" });
+  }
+  const every = Math.ceil(items.length / Math.max(1, Math.floor(pw / 44)));
+  const top = vals.indexOf(Math.max(...vals));
+  g += items.map((d, i) => {
+    const cx = m.l + slot * i + slot / 2, x = cx - cw / 2, v = vals[i];
+    return `<g class="vmark" data-t="${i}" data-open="${d.id}" tabindex="0" role="img" aria-label="Application ${d.id}: ${fmtMs(v)}">
+      <rect x="${m.l + slot * i}" y="${m.t}" width="${slot}" height="${ph}" fill="transparent"/>
+      <path class="mk" d="${vbarPath(x, base, cw, Math.max(Y(v), 2))}" fill="${VZ.s[0]}"/>
+      ${i === top ? svgText(cx, base - Y(v) - 10, fmtMs(v), { fill: VZ.ink, anchor: "middle", weight: 600, cls: "tn" }) : ""}
+      ${i % every === 0 ? svgText(cx, h - 12, `#${d.id}`, { anchor: "middle", cls: "tn" }) : ""}
+    </g>`;
+  }).join("");
+  return { svg: `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="viz-svg">${g}</svg>`,
+    tips: items.map((d, i) => ({ title: d.invoice_no, rows: [{ color: VZ.s[0], value: fmtMs(vals[i]), label: "upload to decision" }, { value: STATUS[d.status] || d.status, label: `application #${d.id}` }], note: "Click to open" })),
+    empty: items.length ? null : "No decisions yet" };
+}
+const tableHtml = (head, rows) => `<table><tr>${head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr>${rows.map((r) => `<tr>${r.map((c) => `<td>${esc(c)}</td>`).join("")}</tr>`).join("") || `<tr><td colspan="${head.length}" class="muted">No data yet</td></tr>`}</table>`;
+
 /* ---------------- lender dashboard ---------------- */
 async function loadDash() {
   const lid = state.persona.lender_id;
-  const [d] = await Promise.all([api(`/api/lenders/${lid}/dashboard`), loadMeta()]);
-  const k = d.kpis;
+  $("#view-dash").classList.add("refreshing");
+  const [d] = await Promise.all([api(`/api/lenders/${lid}/dashboard`), loadMeta()]).finally(() => $("#view-dash").classList.remove("refreshing"));
+  const k = d.kpis, f = d.funnel;
   $("#dash-eyebrow").textContent = `${d.lender.name} · Credit desk`;
   $("#dash-title").textContent = "Portfolio overview";
+  $("#dash-updated").innerHTML = `<span class="dot"></span>Live · updated ${new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}`;
   $("#dash-kpis").innerHTML = [
-    ["Disbursed to SMEs", inr(k.disbursed)], ["Live exposure", inr(k.exposure)],
-    ["Approval rate", k.approval_rate == null ? "—" : Math.round(k.approval_rate * 100) + "%"],
-    ["Fraud & risk blocked", inr(k.blocked_value)], ["Avg. decision time", k.avg_decision_ms ? (k.avg_decision_ms / 1000).toFixed(1) + " s" : "—"],
-    ["Applications", k.applications],
-  ].map(([l, v]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
+    ["Disbursed to SMEs", inr(k.disbursed), `${plural(k.funded_count, "invoice")} funded`],
+    ["Live exposure", inr(k.exposure), `${k.live_count} awaiting buyer payment`],
+    ["Approval rate", k.approval_rate == null ? "—" : Math.round(k.approval_rate * 100) + "%", k.decided ? `${f[2].count} of ${k.decided} decided` : "No decisions yet"],
+    ["Fraud & risk blocked", inr(k.blocked_value), `${plural(k.blocked, "application")} stopped`],
+    ["Avg. decision time", fmtMs(k.avg_decision_ms), "upload to decision"],
+    ["Applications", k.applications, "received to date"],
+  ].map(([l, v, s]) => `<div class="kpi"><span>${l}</span><b>${v}</b><small>${esc(s)}</small></div>`).join("");
+
+  const recv = f[0].count;
+  vizCard("viz-funnel", {
+    title: "Application funnel", sub: "Every invoice received, and how far it got",
+    figure: recv ? `${Math.round((f[3].count / recv) * 100)}%` : "—", figureNote: recv ? `of ${plural(recv, "application")} reached disbursal` : "no applications yet",
+    draw: (w) => drawHBars(w, f.map((s) => ({ label: s.stage, value: s.count,
+      display: recv ? `${s.count} · ${Math.round((s.count / recv) * 100)}%` : "0",
+      tip: { title: s.stage, rows: [{ color: VZ.s[0], value: plural(s.count, "application"), label: recv ? `${Math.round((s.count / recv) * 100)}% of received` : "" }, { value: inr(s.amount), label: "invoice value" }] } })),
+      { max: recv, empty: recv ? null : "Applications appear here as SMEs submit invoices" }),
+    table: () => tableHtml(["Stage", "Applications", "% of received", "Invoice value"], f.map((s) => [s.stage, s.count, recv ? Math.round((s.count / recv) * 100) + "%" : "—", inr(s.amount)])),
+  });
+
+  const br = [...d.blocked_by_reason].sort((a, b) => b.amount - a.amount);
+  vizCard("viz-blocked", {
+    title: "Fraud & risk blocked", sub: "Invoice value stopped before disbursal, by reason",
+    figure: inr(k.blocked_value), figureNote: k.blocked ? `across ${plural(k.blocked, "application")}` : "nothing blocked yet",
+    draw: (w) => drawHBars(w, br.map((r) => ({ label: r.reason, value: r.amount, display: r.amount ? `${inrShort(r.amount)} · ${r.count}` : "—",
+      tip: { title: r.reason, rows: [{ color: VZ.s[0], value: inr(r.amount), label: "invoice value blocked" }, { value: plural(r.count, "application") }] } })),
+      { max: Math.max(...br.map((r) => r.amount)) }),
+    table: () => tableHtml(["Reason", "Applications", "Invoice value"], br.map((r) => [r.reason, r.count, inr(r.amount)])),
+  });
+
+  const t = d.payment_trend;
+  vizCard("viz-trend", {
+    title: "Buyer payment behaviour", sub: `Average days paid after the due date, by quarter (${t.terms_days}-day terms)`,
+    legend: t.series.map((s, i) => {
+      const pts = s.points.filter(Boolean), n = pts.reduce((a, p) => a + p.n, 0);
+      return { label: `${shortName(s.buyer)} · ${n ? Math.round(pts.reduce((a, p) => a + p.avg * p.n, 0) / n) : "—"} days avg`, color: VZ.s[i], shape: "line" };
+    }),
+    draw: (w) => drawLines(w, { labels: t.quarters, series: t.series, threshold: 30 }),
+    table: () => tableHtml(["Quarter", ...t.series.map((s) => shortName(s.buyer))], t.quarters.map((q, i) => [q, ...t.series.map((s) => (s.points[i] ? `${s.points[i].avg} d (${s.points[i].n})` : "—"))])),
+    foot: "From the buyers' repayment records. These feed the buyer factors in every risk score.",
+  });
+
+  const ex = d.exposure_by_buyer;
+  vizCard("viz-exposure", {
+    title: "Exposure by buyer", sub: "Funded, awaiting buyer payment",
+    figure: inr(k.exposure), figureNote: ex.length ? `largest buyer ${Math.round(ex[0].share * 100)}% of book` : "no live exposure",
+    draw: (w) => drawHBars(w, ex.map((x) => ({ label: shortName(x.buyer), value: x.amount, display: `${inrShort(x.amount)} · ${Math.round(x.share * 100)}%`,
+      tip: { title: x.buyer, rows: [{ color: VZ.s[0], value: inr(x.amount), label: "live exposure" }, { value: `${Math.round(x.share * 100)}%`, label: "of live book" }] } })),
+      { max: Math.max(0, ...ex.map((x) => x.amount)), empty: ex.length ? null : "Disbursed invoices appear here until the buyer pays" }),
+    table: () => tableHtml(["Buyer", "Live exposure", "Share"], ex.map((x) => [x.buyer, inr(x.amount), Math.round(x.share * 100) + "%"])),
+    after: d.upcoming.length ? `<div class="viz-after"><h4>Repayments due</h4>${d.upcoming.slice(0, 4).map((u) => {
+      const days = Math.round((new Date(u.due_date) - new Date(new Date().toDateString())) / 864e5);
+      return `<button class="due-row" data-open="${u.id}"><span><b>${esc(u.invoice_no)}</b><small>${esc(shortName(u.buyer_name))} · ${esc(u.due_date)}</small></span><span class="due-r"><b>${inr(u.amount)}</b><small class="${days < 0 ? "bad-t" : ""}">${days < 0 ? `${-days} days overdue` : days === 0 ? "due today" : `in ${days} days`}</small></span></button>`;
+    }).join("")}</div>` : "",
+  });
+
+  vizCard("viz-scores", {
+    title: "Risk scores against policy", sub: "Each application's score, and the decision band it fell in",
+    legend: [{ label: "Scored application", color: VZ.s[0], shape: "dot" }, { label: "Blocked by a hard stop", color: VZ.crit, shape: "x" }],
+    draw: (w) => drawScoreStrip(w, d.scores),
+    table: () => tableHtml(["Invoice", "Score", "Grade", "Decision", "Hard stop"], d.scores.map((a) => [a.invoice_no, a.score, a.grade, STATUS[a.status] || a.status, a.hard_stop ? "Yes" : "No"])),
+    foot: "A hard stop (duplicate, tampering, already paid, PO over-billed) declines the invoice whatever its score.",
+  });
+
+  const dt = d.decision_times.slice(-24), sec = dt.map((x) => x.ms).sort((a, b) => a - b);
+  const median = sec.length ? (sec.length % 2 ? sec[(sec.length - 1) / 2] : (sec[sec.length / 2 - 1] + sec[sec.length / 2]) / 2) : null;
+  vizCard("viz-time", {
+    title: "Decision time", sub: "Upload to decision, per application",
+    figure: fmtMs(median), figureNote: median == null ? "no decisions yet" : "median",
+    draw: (w) => drawColumns(w, dt),
+    table: () => tableHtml(["Application", "Invoice", "Time", "Decision"], dt.map((x) => [`#${x.id}`, x.invoice_no, fmtMs(x.ms), STATUS[x.status] || x.status])),
+    foot: "Covers reading every document, all checks, the duplicate shield and scoring.",
+  });
+
   const row = (a, right) => `<button class="mini" data-open="${a.id}"><span><b>${esc(a.invoice_no)}</b><small>${esc(a.seller_name)} → ${esc(a.buyer_name)}</small></span><span class="mini-r">${right}</span></button>`;
   $("#dash-attention").innerHTML = d.attention.length ? d.attention.map((a) => row(a, `${pill(a.status)}<b>${inr(a.amount)}</b>`)).join("")
     : `<p class="muted">You're all caught up. New verified applications land here.</p>`;
   $("#dash-blocked").innerHTML = d.blocked.length ? d.blocked.map((a) => row(a, `<b class="bad-t">${inr(a.amount)}</b>`).replace("</small></span>", `</small><small class="bad-t">${esc((a.stop || "Declined on risk").split(":")[0])}</small></span>`)).join("")
     : `<p class="muted">Nothing blocked yet.</p>`;
-  const max = Math.max(1, ...d.exposure_by_buyer.map((x) => x.amount));
-  $("#dash-exposure").innerHTML = d.exposure_by_buyer.length ? d.exposure_by_buyer.map((x) =>
-    `<div class="xbar"><span>${esc(x.buyer)}</span><div><i style="width:${(x.amount / max) * 100}%"></i></div><b>${inr(x.amount)}</b></div>`).join("")
-    : `<p class="muted">No live exposure. Disbursed invoices appear here until the buyer pays.</p>`;
   const c = state.meta.chain;
-  $("#dash-network").innerHTML = `<dl class="kv">
+  $("#dash-network").innerHTML = `<dl class="kv kv-wide">
     <dt>Status</dt><dd><span class="dot ${c.mode === "hardhat" ? "" : "off"}" style="display:inline-block;margin-right:6px"></span>${c.mode === "hardhat" ? "Synced" : "Offline"}</dd>
     <dt>Network</dt><dd>${esc(c.network)}</dd><dt>Registry contract</dt><dd class="hash">${esc(c.contract)}</dd>
     <dt>Latest block</dt><dd>${c.block}</dd><dt>Audit anchors</dt><dd>${c.anchors}</dd>
     <dt>Lenders in network</dt><dd>${state.meta.lenders.map((l) => esc(l.name)).join(", ")}</dd></dl>`;
-  $$("#view-dash [data-open]").forEach((b) => (b.onclick = () => openApp(+b.dataset.open)));
+  $$("#view-dash .mini[data-open]").forEach((b) => (b.onclick = () => openApp(+b.dataset.open)));
 }
 
 /* ---------------- business: my invoices ---------------- */
