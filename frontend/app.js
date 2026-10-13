@@ -14,7 +14,7 @@ function ring(value, tone, big, small, size = 128) {
   return `<div class="ring" style="width:${size}px;height:${size}px"><svg viewBox="0 0 120 120"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><circle cx="60" cy="60" r="${r}" class="ring-track"/><circle cx="60" cy="60" r="${r}" class="ring-prog" stroke="url(#${id})" style="--c:${c};stroke-dasharray:${c};stroke-dashoffset:${(c * (1 - v / 100)).toFixed(1)}" transform="rotate(-90 60 60)"/></svg><div class="ring-label"><b>${big}</b><span>${small}</span></div></div>`;
 }
 
-const state = { meta: null, lender: "", selected: null, tab: "verify", lastRuns: {}, persona: null, view: "home" };
+const state = { meta: null, lender: "", selected: null, tab: "verify", lastRuns: {}, persona: null, view: "home", labLender: "lender_a" };
 
 /* ---------------- workspaces (personas) ---------------- */
 const PERSONAS = [
@@ -109,6 +109,9 @@ async function loadMeta() {
   const c = m.chain;
   $("#chips").innerHTML = `<span class="chip" title="Consortium ledger · block ${c.block ?? "?"} · InvoiceRegistry ${esc(c.contract || "")}"><span class="dot ${c.mode === "hardhat" ? "" : "off"}"></span>${c.mode === "hardhat" ? "Ledger synced" : "Ledger offline"}</span>`;
 
+  $("#lab-lender").innerHTML = m.lenders.map((l) => `<button data-ll="${l.id}" class="${state.labLender === l.id ? "on" : ""}">${esc(l.name)}</button>`).join("");
+  $$("#lab-lender button").forEach((b) => (b.onclick = () => { state.labLender = b.dataset.ll; loadMeta(); }));
+  const lenderName = (id) => m.lenders.find((l) => l.id === id)?.name || id;
   $("#lab").innerHTML = Object.entries(m.scenarios).map(([key, sc], i) => {
     const lender = m.lenders.find((l) => l.id === sc.lender);
     const run = state.lastRuns[key];
@@ -119,11 +122,12 @@ async function loadMeta() {
       <p class="expect"><span>Expected</span>${esc(sc.expect)}</p>
       ${run ? `<div class="result">${pill(run.status)} <b>Score ${run.risk?.score ?? "—"}</b> · ${esc(firstReason(run))}<br><a data-open="${run.id}">Open application #${run.id} →</a>
         ${["AUTO_APPROVED", "APPROVED"].includes(run.status) ? `<div style="margin-top:10px"><button class="btn chain" data-disburse="${run.id}" data-key="${key}">Disburse &amp; register on-chain</button></div>` : ""}</div>` : ""}
-      <button class="btn ${run ? "secondary" : "primary"}" data-run="${key}">${run ? "Run again" : "Submit to " + esc(lender.name)}</button>
+      <button class="btn ${run ? "secondary" : "primary"}" data-run="${key}">${run ? "Run again" : sc.requires ? (key === "02_double_pledge" ? "Submit to the other lender" : "Submit to 01's lender") : "Submit to " + esc(lenderName(state.labLender))}</button>
     </article>`;
   }).join("");
   $$("[data-run]").forEach((b) => (b.onclick = () => busy(b, async () => {
-    const d = await post(`/api/scenarios/${b.dataset.run}/run`);
+    const q = m.scenarios[b.dataset.run].requires ? "" : `?lender_id=${state.labLender}`;
+    const d = await post(`/api/scenarios/${b.dataset.run}/run${q}`);
     state.lastRuns[b.dataset.run] = d;
     if (d.prep?.length) toast(d.prep[0]);
     await loadMeta();

@@ -206,27 +206,24 @@ def run_scenario(name: str, lender_id: str | None = None):
     if name not in SCENARIOS:
         raise HTTPException(404, "Unknown scenario")
     sc = SCENARIOS[name]
-    prep = []
+    target = lender_id if lender_id in LENDERS else sc["lender"]
     if sc.get("requires") == "01_clean":
+        # Scenarios 02 and 05 build on the genuine invoice from scenario 01; nothing is done behind the scenes.
         with db() as c:
-            funded = _find_funded(c, "INV-2026-1001")
-        with db() as c:
-            pending = c.execute("SELECT id FROM applications WHERE invoice_no='INV-2026-1001' AND lender_id='lender_a' "
-                                "AND status IN ('AUTO_APPROVED','APPROVED') ORDER BY id LIMIT 1").fetchone()
-        if not funded and pending:  # original was approved but never disbursed: fund it so it's on-chain
-            disburse(pending["id"])
-            prep.append(f"Disbursed application #{pending['id']} (INV-2026-1001 at Shakti Bank) first, registering it on-chain.")
-        elif not funded:  # make sure the original invoice is funded at Lender A first
-            first = process("lender_a", _scenario_files("01_clean"))
-            with db() as c:
-                st = c.execute("SELECT status FROM applications WHERE id=?", (first,)).fetchone()["status"]
-            if st in ("AUTO_APPROVED", "APPROVED"):
-                disburse(first)
-            prep.append(f"Submitted and funded INV-2026-1001 at Shakti Bank first (application #{first}).")
-    app_id = process(lender_id or sc["lender"], _scenario_files(name))
+            orig = c.execute("SELECT id, lender_id, status FROM applications WHERE invoice_no='INV-2026-1001' "
+                             "AND status NOT IN ('REJECTED','SUBMITTED') ORDER BY id DESC LIMIT 1").fetchone()
+        if not orig:
+            raise HTTPException(409, "Run scenario 01 first: submit the genuine invoice to a lender.")
+        if name == "02_double_pledge":
+            if orig["status"] != "FUNDED":
+                raise HTTPException(409, "Disburse scenario 01 first, so the invoice is registered on-chain. Then try the second lender.")
+            target = "lender_b" if orig["lender_id"] == "lender_a" else "lender_a"  # the lender that did NOT fund it
+        else:
+            target = orig["lender_id"]  # re-billing goes back to the same lender
+    app_id = process(target, _scenario_files(name))
     with db() as c:
         d = app_detail(c, app_id)
-    d["prep"] = prep
+    d["prep"] = []
     return d
 
 

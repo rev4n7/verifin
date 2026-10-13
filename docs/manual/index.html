@@ -147,7 +147,7 @@ dl.faq dd{margin:4px 0 0;color:var(--ink-2)}
     <div class="step">
       <div class="step-head"><span class="no">2.1</span><h3>Open the drawer</h3></div>
       <ol>
-        <li><span class="n">1</span><span>Press <b>P</b> on the keyboard, or click ▶ in the bottom-right corner. Click <b>Submit to Shakti Bank</b> on scenario 01.</span></li>
+        <li><span class="n">1</span><span>Press <b>P</b> on the keyboard, or click ▶ in the bottom-right corner. The toggle at the top picks which lender gets scenarios 01, 03, 04 and 06. Click <b>Submit</b> on scenario 01.</span></li>
         <li><span class="n">2</span><span><b>Reset data</b> wipes everything and deploys a fresh contract. Do this before every presentation.</span></li>
       </ol>
       <figure><img src="img/04-presenter-drawer.jpg" alt="Presenter drawer listing scenarios with the first Submit button and Reset data highlighted" loading="lazy"><figcaption>Six scenarios: one genuine invoice, four fraud attempts, one risky buyer.</figcaption></figure>
@@ -159,7 +159,7 @@ dl.faq dd{margin:4px 0 0;color:var(--ink-2)}
     </div>
     <div class="step">
       <div class="step-head"><span class="no">2.3</span><h3>Try to finance it twice</h3></div>
-      <ol><li><span class="n">1</span><span>Click scenario 02. The same invoice, re-issued with a different number format, goes to Kaveri Capital. It's <b>rejected</b>: the on-chain registry shows Shakti Bank already financed it.</span></li></ol>
+      <ol><li><span class="n">1</span><span>Click scenario 02. The same invoice, re-issued with a different number format, goes to <b>the other lender</b> (Kaveri Capital if Shakti Bank funded 01, and the reverse). It's <b>rejected</b>: the on-chain registry shows the first lender already financed it.</span></li></ol>
       <figure><img src="img/06-duplicate-blocked.jpg" alt="Scenario 02 rejected as duplicate financing" loading="lazy"><figcaption>Kaveri's own records were clean. Only the shared registry could catch this.</figcaption></figure>
       <p class="tip"><b>Then run 03 to 06.</b> 03: inflated invoice with an edited PDF. 04: genuine but slow-paying buyer. 05: same delivery billed under a new number. 06: an invoice the buyer already paid.</p>
     </div>
@@ -313,7 +313,8 @@ dl.faq dd{margin:4px 0 0;color:var(--ink-2)}
     <dl class="faq">
       <dt>The page doesn't load at localhost:8000</dt><dd>The app isn't running. Double-click <code>start.bat</code> and keep both terminal windows open.</dd>
       <dt>The status chip says "Ledger offline"</dt><dd>The blockchain window was closed. Close both windows and run <code>start.bat</code> again. The app clears old data automatically when it detects a fresh chain.</dd>
-      <dt>Scenario 02 was approved instead of blocked</dt><dd>Invoice #1 hadn't been paid out yet. Current versions fund it automatically first; if you see this, click <b>Reset data</b> and run 01 → Disburse → 02.</dd>
+      <dt>Scenario 02 says "Disburse scenario 01 first"</dt><dd>Scenario 02 tests a second lender after the first one has paid out. Click <b>Disburse &amp; register on-chain</b> on card 01, then run 02.</dd>
+      <dt>Scenario 02 was rejected, but I sent it to Kaveri first</dt><dd>Check the lender list: if any lender already funded INV-2026-1001, every other lender is blocked. That's the point. Press P, then <b>Reset data</b> to start clean.</dd>
       <dt>Fonts look different</dt><dd>The typeface loads from Google Fonts. Offline, the app falls back to the system font and still works.</dd>
       <dt>I want to start over</dt><dd>Press P, then <b>Reset data</b>.</dd>
     </dl>

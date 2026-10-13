@@ -278,8 +278,8 @@ def scenario_docs():
     S["02_double_pledge"] = {
         "title": "Double-pledge to a second lender", "attack": "Duplicate financing", "lender": "lender_b", "buyer": "Zenith Motors",
         "requires": "01_clean",
-        "story": "Acme re-issues the same invoice from a different template (number written INV/2026/1001) and takes it to Kaveri Capital, after Shakti Bank already funded it.",
-        "expect": "Kaveri's own records are clean, but the on-chain consortium registry blocks it.",
+        "story": "After one lender funds scenario 01, Acme re-issues the same invoice from a different template (number written INV/2026/1001) and takes it to the other lender.",
+        "expect": "The second lender's own records are clean, but the shared on-chain registry blocks it. Needs 01 disbursed first.",
         "docs": {
             "po": ("po", {**base, **zen, "po_number": "PO-ZM-7781", "po_date": d(20), "items": po1_items}, 2, created(20)),
             "grn": ("grn", {**base, **zen, "grn_no": "GRN-ZM-4410", "grn_date": d(8), "po_number": "PO-ZM-7781",
@@ -318,7 +318,7 @@ def scenario_docs():
         "title": "Same delivery billed twice", "attack": "Renumbered duplicate", "lender": "lender_a", "buyer": "Zenith Motors",
         "requires": "01_clean",
         "story": "A new invoice number (INV-2026-1009) billing the same PO and delivery as INV-2026-1001, sent to the same bank. The fingerprint is different, so a hash check alone misses it.",
-        "expect": "PO billing ledger shows the PO billed at 200%, and near-duplicate detection flags it. Rejected.",
+        "expect": "Goes to the lender that took scenario 01. The PO billing ledger shows the PO billed at 200%. Rejected.",
         "docs": {
             "po": ("po", {**base, **zen, "po_number": "PO-ZM-7781", "po_date": d(20), "items": po1_items}, 1, created(20)),
             "grn": ("grn", {**base, **zen, "grn_no": "GRN-ZM-4410", "grn_date": d(8), "po_number": "PO-ZM-7781",
